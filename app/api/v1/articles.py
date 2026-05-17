@@ -1,10 +1,20 @@
 """API v1 routes - articles. 全链路统一北京时间 (CST = UTC+8)。"""
+import os
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func
 from typing import Optional
 
-from ..db import get_session, Article
+from ...db import get_session, Article
+
+API_KEY = os.environ.get("API_KEY", "")
+
+
+def _check_auth(authorization: str):
+    """检查 API Key 鉴权。"""
+    if API_KEY and authorization != f"Bearer {API_KEY}":
+        raise HTTPException(401, "Unauthorized")
+
 
 router = APIRouter(prefix="/api/v1", tags=["articles"])
 

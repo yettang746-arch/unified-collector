@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .db import init_db
 from .api.v1.articles import router as articles_router
+from .api.v1.sources_api import router as sources_router
 from .collector import collect_all, load_config
 
 API_KEY = os.environ.get("API_KEY", "")
@@ -69,3 +70,4 @@ def get_config(authorization: str = Header(None)):
 
 
 app.include_router(articles_router)
+app.include_router(sources_router)
