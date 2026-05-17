@@ -2,6 +2,7 @@
 import os
 from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from .db import init_db
 from .api.v1.articles import router as articles_router
@@ -71,3 +72,12 @@ def get_config(authorization: str = Header(None)):
 
 app.include_router(articles_router)
 app.include_router(sources_router)
+
+# Dashboard
+app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
+
+
+@app.get("/")
+def dashboard():
+    from fastapi.responses import FileResponse
+    return FileResponse(os.path.join(os.path.dirname(__file__), "static", "index.html"))
