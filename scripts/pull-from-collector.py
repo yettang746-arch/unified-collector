@@ -104,16 +104,26 @@ def build_inbox_md(articles: list, scope: str, date_str: str) -> str:
     return "\n".join(lines).strip()
 
 
-def build_selection_json(articles: list) -> list:
+def build_selection_json(articles: list, img_map: dict = None) -> list:
     import re
     results = []
-    for a in articles:
+    for idx, a in enumerate(articles):
         desc = a.get("summary", "")
         links = re.findall(r'https?://[^\s)"<>]+', desc)
         url = a.get("url", "")
         if url and url not in links:
             links.insert(0, url)
         tags = re.findall(r'#\w+', desc)
+        # 提取远程图片
+        remote_images = []
+        raw_content = a.get("raw_content", "")
+        if raw_content:
+            try:
+                rc = json.loads(raw_content)
+                remote_images = rc.get("images", [])
+            except Exception:
+                pass
+        local_imgs = img_map.get(idx, []) if img_map else []
         results.append({
             "source": a.get("source", ""),
             "category": a.get("category", ""),
@@ -121,16 +131,72 @@ def build_selection_json(articles: list) -> list:
             "desc": desc,
             "link": url,
             "links": links,
-            "images": images if 'images' in dir() else [],
+            "images": remote_images,
+            "local_images": local_imgs,
             "tags": list(set(tags)),
             "pub": a.get("published_at", ""),
         })
     return results
 
 
-def build_ecom_products_md(articles: list, date_str: str) -> str:
+def _download_image(url: str, save_path: str) -> bool:
+    """下载图片到本地，返回是否成功。"""
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        ctx = ssl.create_default_context()
+        with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
+            if resp.status == 200:
+                with open(save_path, "wb") as f:
+                    f.write(resp.read())
+                return True
+    except Exception as e:
+        print(f"    ⚠️ 下载失败 {url[:60]}...: {e}")
+    return False
+
+
+def _download_article_images(articles: list, img_dir: str) -> dict:
+    """批量下载文章图片到指定目录，返回 {article_index: [local_paths]}。"""
+    os.makedirs(img_dir, exist_ok=True)
+    result = {}
+    total = 0
+    ok = 0
+    for idx, a in enumerate(articles):
+        images = []
+        raw_content = a.get("raw_content", "")
+        if raw_content:
+            try:
+                rc = json.loads(raw_content)
+                images = rc.get("images", [])
+            except Exception:
+                pass
+        if not images:
+            continue
+        local_paths = []
+        src = a.get("source", "unknown").replace("/", "_").replace(" ", "_")[:30]
+        for i, img_url in enumerate(images[:3]):  # 每条最多3张
+            total += 1
+            ext = ".jpg"
+            if ".png" in img_url:
+                ext = ".png"
+            elif ".webp" in img_url:
+                ext = ".webp"
+            filename = f"{src}_{idx}_{i}{ext}"
+            save_path = os.path.join(img_dir, filename)
+            if os.path.exists(save_path):
+                local_paths.append(save_path)
+                ok += 1
+            elif _download_image(img_url, save_path):
+                local_paths.append(save_path)
+                ok += 1
+        if local_paths:
+            result[idx] = local_paths
+    print(f"  📷 图片: {ok}/{total} 下载成功 → {img_dir}")
+    return result
+
+
+def build_ecom_products_md(articles: list, date_str: str, img_map: dict = None) -> str:
     """按 source 分组输出选品数据，兼容方远热卖好物初稿的输入格式。
-    格式：# 标题 > ## 频道名 > ### [时间] 标题 + 描述 + 链接
+    格式：# 标题 > ## 频道名 > ### [时间] 标题 + 描述 + 链接 + 本地图片
     """
     import re
 
@@ -142,12 +208,22 @@ def build_ecom_products_md(articles: list, date_str: str) -> str:
 
     lines = [f"# 跨境电商选品参考 ({date_str})", ""]
     lines.append(f"> 共 {len(articles)} 条")
+    if img_map:
+        img_count = sum(len(v) for v in img_map.values())
+        lines.append(f"> 📷 已下载 {img_count} 张素材图片")
     lines.append("")
 
     for src, items in by_source.items():
         lines.append(f"## {src}")
         lines.append("")
-        for a in items:
+        for item_idx, a in enumerate(items):
+            # 找到这篇文章在 articles 里的全局索引
+            global_idx = None
+            for gi, ga in enumerate(articles):
+                if ga is a:
+                    global_idx = gi
+                    break
+
             title = a.get("title", "").strip()
             desc = a.get("summary", "").strip()
             pub = a.get("published_at", "")
@@ -164,17 +240,22 @@ def build_ecom_products_md(articles: list, date_str: str) -> str:
             lines.append(f"### [{pub_short}] {title}")
             lines.append("")
 
-            # 图片（从 raw_content 提取）
+            # 图片：优先用本地下载的，fallback 到远程 URL
             images = []
             raw_content = a.get("raw_content", "")
             if raw_content:
                 try:
-                    import json as _json
-                    rc = _json.loads(raw_content)
+                    rc = json.loads(raw_content)
                     images = rc.get("images", [])
                 except Exception:
                     pass
-            if images:
+
+            local_imgs = img_map.get(global_idx, []) if img_map else []
+            if local_imgs:
+                for lp in local_imgs:
+                    lines.append(f"![img]({lp})")
+                lines.append("")
+            elif images:
                 for img in images[:3]:
                     lines.append(f"![img]({img})")
                 lines.append("")
@@ -248,15 +329,18 @@ def main():
                 f.write(content + "\n")
 
         if scope == "selection":
-            # 选品：用方远兼容格式，文件名为 _ecom_products.md
-            ecom_content = build_ecom_products_md(articles, today)
+            # 选品：先下载图片，再用方远兼容格式输出
+            img_dir = os.path.join(out_dir, "images", today)
+            img_map = _download_article_images(articles, img_dir)
+
+            ecom_content = build_ecom_products_md(articles, today, img_map)
             ecom_path = os.path.join(out_dir, f"{today}_ecom_products.md")
             with open(ecom_path, "w", encoding="utf-8") as f:
                 f.write(ecom_content + "\n")
             print(f"  ✅ Written {len(ecom_content)} bytes → {ecom_path}")
 
             # JSON 也保留
-            sel_data = build_selection_json(articles)
+            sel_data = build_selection_json(articles, img_map)
             json_path = os.path.join(out_dir, f"{today}_ecom_products.json")
             with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(sel_data, f, ensure_ascii=False, indent=2)

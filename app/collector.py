@@ -10,7 +10,10 @@ from .crawlers import create_crawler
 from .db import get_session, Article
 
 
-def load_config(config_path: str = "/app/config/sources.yaml") -> Dict[str, Any]:
+def load_config(config_path: str = None) -> Dict[str, Any]:
+    import os
+    if config_path is None:
+        config_path = os.environ.get("SOURCES_CONFIG", "/app/config/sources.yaml")
     with open(config_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
@@ -24,7 +27,10 @@ def _parse_published_at(raw: str) -> datetime | None:
         return None
 
 
-def collect_all(config_path: str = "/app/config/sources.yaml") -> Dict[str, Any]:
+def collect_all(config_path: str = None) -> Dict[str, Any]:
+    import os
+    if config_path is None:
+        config_path = os.environ.get("SOURCES_CONFIG", "/app/config/sources.yaml")
     """Run all enabled crawlers and store results. Returns stats."""
     config = load_config(config_path)
     rsshub_base = config.get("rsshub", {}).get("base_url", "https://rss.255202.xyz")

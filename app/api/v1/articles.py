@@ -32,6 +32,7 @@ def _article_to_dict(a: Article) -> dict:
         "title": a.title,
         "url": a.url,
         "summary": a.summary or "",
+        "raw_content": a.raw_content or "",
         "tags": a.tags or "",
         "lang": a.lang or "en",
         "published_at": a.published_at.isoformat() if a.published_at else None,
