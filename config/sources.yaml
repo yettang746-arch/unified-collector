@@ -573,6 +573,230 @@ sources:
     lang: zh
     enabled: true
 
+  # ==================== scope: tech (新增) ====================
+
+  # --- AI 实验室博客 ---
+  - name: "DeepMind Blog"
+    type: rss
+    url: "https://deepmind.google/blog/rss.xml"
+    scope: tech
+    category: ai-frontier
+    lang: en
+    enabled: true
+
+  - name: "Google AI Blog"
+    type: rss
+    url: "https://blog.google/rss/"
+    scope: tech
+    category: ai-frontier
+    lang: en
+    enabled: true
+
+  # --- 大厂工程博客 ---
+  - name: "AWS Blog"
+    type: rss
+    url: "https://aws.amazon.com/blogs/aws/feed/"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "Cloudflare Blog"
+    type: rss
+    url: "https://blog.cloudflare.com/rss/"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "Vercel Blog"
+    type: rss
+    url: "https://vercel.com/atom"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "Sentry Blog"
+    type: rss
+    url: "https://sentry.io/feed/"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "Slack Engineering"
+    type: rss
+    url: "https://slack.engineering/feed/"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "Spotify Engineering"
+    type: rss
+    url: "https://engineering.atspotify.com/feed/"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "Meta Engineering"
+    type: rss
+    url: "https://engineering.fb.com/feed/"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "Netflix TechBlog"
+    type: rss
+    url: "https://netflixtechblog.com/feed/"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "Airbnb Engineering"
+    type: rss
+    url: "https://medium.com/feed/airbnb-engineering"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  # --- 科技媒体（英文）---
+  - name: "NYT Technology"
+    type: rss
+    url: "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml"
+    scope: tech
+    category: tech-industry
+    lang: en
+    enabled: true
+
+  - name: "BBC Technology"
+    type: rss
+    url: "https://feeds.bbci.co.uk/news/technology/rss.xml"
+    scope: tech
+    category: tech-industry
+    lang: en
+    enabled: true
+
+  - name: "Ars Technica"
+    type: rss
+    url: "https://feeds.arstechnica.com/arstechnica/technology-lab"
+    scope: tech
+    category: tech-industry
+    lang: en
+    enabled: true
+
+  - name: "IEEE Spectrum"
+    type: rss
+    url: "https://spectrum.ieee.org/rss/fulltext"
+    scope: tech
+    category: tech-industry
+    lang: en
+    enabled: true
+
+  - name: "TechCrunch Venture"
+    type: rss
+    url: "https://techcrunch.com/category/venture/feed/"
+    scope: tech
+    category: tech-industry
+    lang: en
+    enabled: true
+
+  - name: "VentureBeat AI"
+    type: rss
+    url: "https://venturebeat.com/category/ai/feed/"
+    scope: tech
+    category: ai-frontier
+    lang: en
+    enabled: true
+
+  - name: "Wired Business"
+    type: rss
+    url: "https://www.wired.com/feed/category/business/latest/rss"
+    scope: tech
+    category: tech-industry
+    lang: en
+    enabled: true
+
+  # --- 中文科技 ---
+  - name: "知乎热榜"
+    type: rsshub
+    route: "/zhihu/hot"
+    scope: tech
+    category: tech-industry
+    lang: zh
+    enabled: true
+
+  - name: "HN Best"
+    type: rss
+    url: "https://hnrss.org/best"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  # ==================== scope: cross-border (新增) ====================
+
+  - name: "eBay Tech Blog"
+    type: rss
+    url: "https://ebaytechblog.com/feed/"
+    scope: cross-border
+    category: tools
+    lang: en
+    enabled: true
+
+  - name: "eBay Inc Tech"
+    type: rss
+    url: "https://tech.ebayinc.com/rss"
+    scope: cross-border
+    category: tools
+    lang: en
+    enabled: true
+
+  - name: "Twilio Blog"
+    type: rss
+    url: "https://twilio.com/blog/feed"
+    scope: cross-border
+    category: tools
+    lang: en
+    enabled: true
+
+  - name: "Segment Blog"
+    type: rss
+    url: "https://segment.com/blog/feed/"
+    scope: cross-border
+    category: tools
+    lang: en
+    enabled: true
+
+  - name: "Amplitude Blog"
+    type: rss
+    url: "https://blog.amplitude.com/feed/"
+    scope: cross-border
+    category: tools
+    lang: en
+    enabled: true
+
+  - name: "Intercom Blog"
+    type: rss
+    url: "https://www.intercom.com/blog/feed/"
+    scope: cross-border
+    category: tools
+    lang: en
+    enabled: true
+
+  - name: "Contentful Blog"
+    type: rss
+    url: "https://www.contentful.com/blog/feed.xml"
+    scope: cross-border
+    category: tools
+    lang: en
+    enabled: true
+
   - name: "WB/Ozon 折扣好物"
     type: telegram
     channel: "wildberriesozonobzor"
