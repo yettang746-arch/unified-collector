@@ -290,7 +290,7 @@ createApp({
         dbTotal.value = articlesData.total || 0;
         lastUpdate.value = new Date().toLocaleTimeString('zh-CN');
         lastCollectTime.value = articles.value.length > 0
-          ? formatTime(articles.value[0].fetched_at) : '-';
+          ? formatTime(articles.value[0].fetched_at) : '-;
 
         await nextTick();
         renderCharts();

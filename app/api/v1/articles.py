@@ -132,15 +132,4 @@ def article_stats(
     }
 
 
-@router.get("/sources")
-def list_sources(session=Depends(get_session)):
-    """列出所有数据源及其类型和 scope。"""
-    results = session.query(
-        Article.source, Article.source_type, Article.scope, Article.category, func.count(Article.id)
-    ).group_by(Article.source, Article.source_type, Article.scope, Article.category).all()
-    return {
-        "sources": [
-            {"name": r[0], "type": r[1], "scope": r[2], "category": r[3], "count": r[4]}
-            for r in results
-        ]
-    }
+
