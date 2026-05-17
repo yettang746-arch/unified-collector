@@ -1,7 +1,7 @@
 """Collector engine - orchestrates all crawlers and stores results."""
 import json
 import yaml
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Any
@@ -69,7 +69,9 @@ def collect_all(config_path: str = "/app/config/sources.yaml") -> Dict[str, Any]
 
     # Store to DB
     from .db import SessionLocal
-    now = datetime.now(timezone.utc)
+    # 全链路统一北京时间（CST = UTC+8）
+    cst = timezone(timedelta(hours=8))
+    now = datetime.now(cst)
     stored = 0
     skipped = 0
     session = SessionLocal()

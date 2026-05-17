@@ -1,4 +1,4 @@
-"""API v1 routes - articles."""
+"""API v1 routes - articles. 全链路统一北京时间 (CST = UTC+8)。"""
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func
@@ -7,6 +7,9 @@ from typing import Optional
 from ..db import get_session, Article
 
 router = APIRouter(prefix="/api/v1", tags=["articles"])
+
+# 全局统一：北京时间
+CST = timezone(timedelta(hours=8))
 
 
 def _article_to_dict(a: Article) -> dict:
@@ -26,9 +29,17 @@ def _article_to_dict(a: Article) -> dict:
     }
 
 
+def _date_range_cst(date_str: str):
+    """将 'YYYY-MM-DD' 转为 CST 当天的起止 datetime，用于 DB 查询。"""
+    d = datetime.strptime(date_str, "%Y-%m-%d")
+    start = datetime(d.year, d.month, d.day, tzinfo=CST)
+    end = start + timedelta(days=1)
+    return start, end
+
+
 @router.get("/articles")
 def list_articles(
-    date: Optional[str] = Query(None, description="Filter by date YYYY-MM-DD (uses fetched_at UTC)"),
+    date: Optional[str] = Query(None, description="按北京时间日期过滤 YYYY-MM-DD"),
     scope: Optional[str] = Query(None, description="一级分类: tech | cross-border | russia | selection"),
     category: Optional[str] = Query(None, description="二级分类（需配合 scope 使用）"),
     source: Optional[str] = Query(None, description="按来源名称过滤"),
@@ -38,20 +49,11 @@ def list_articles(
     offset: int = Query(0, ge=0),
     session=Depends(get_session),
 ):
-    """查询文章列表。
-
-    scope 是主要的隔离维度：
-    - scope=tech → 晨报脚本拿全部技术类
-    - scope=russia → 俄罗斯晨报拿全部俄罗斯类
-    - scope=selection → 选品雷达拿全部选品类
-    - scope=cross-border → 跨境日报拿跨境电商行业类
-    """
+    """查询文章列表。所有时间均为北京时间 (CST/UTC+8)。"""
     q = session.query(Article)
     if date:
         try:
-            d = datetime.strptime(date, "%Y-%m-%d")
-            start = datetime(d.year, d.month, d.day, tzinfo=timezone.utc)
-            end = start + timedelta(days=1)
+            start, end = _date_range_cst(date)
             q = q.filter(Article.fetched_at >= start, Article.fetched_at < end)
         except ValueError:
             raise HTTPException(400, "Invalid date format, use YYYY-MM-DD")
@@ -84,18 +86,17 @@ def article_stats(
     scope: Optional[str] = Query(None),
     session=Depends(get_session),
 ):
-    """采集统计。按 scope + source 分组计数。"""
+    """采集统计（北京时间）。"""
     q = session.query(Article)
     if date:
         try:
-            d = datetime.strptime(date, "%Y-%m-%d")
-            start = datetime(d.year, d.month, d.day, tzinfo=timezone.utc)
-            end = start + timedelta(days=1)
+            start, end = _date_range_cst(date)
             q = q.filter(Article.fetched_at >= start, Article.fetched_at < end)
         except ValueError:
             raise HTTPException(400, "Invalid date format, use YYYY-MM-DD")
     else:
-        q = q.filter(Article.fetched_at >= datetime.now(timezone.utc) - timedelta(days=1))
+        # 默认取最近24小时（CST）
+        q = q.filter(Article.fetched_at >= datetime.now(CST) - timedelta(days=1))
     if scope:
         q = q.filter(Article.scope == scope)
 

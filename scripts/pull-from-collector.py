@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-统一采集拉取脚本 - 替代 morning-brief-local.py + tech-collector-pull.py + russian-market-pull.py
-下游统一从 collector API 按 scope 拉数据，互不干扰。
+统一采集拉取脚本 - 全链路北京时间
+下游按 scope 拉数据，互不干扰。
 
 用法：
-  python3 pull-from-collector.py --scope tech       → 晨报素材
-  python3 pull-from-collector.py --scope russia     → 俄罗斯市场晨报
-  python3 pull-from-collector.py --scope selection  → 选品参考
-  python3 pull-from-collector.py --scope cross-border → 跨境日报
-  python3 pull-from-collector.py --all              → 全部（调试用）
+  python3 pull-from-collector.py --scope tech          → 晨报素材
+  python3 pull-from-collector.py --scope russia        → 俄罗斯市场晨报
+  python3 pull-from-collector.py --scope selection     → 选品参考
+  python3 pull-from-collector.py --scope cross-border  → 跨境日报
+  python3 pull-from-collector.py --all                 → 全部（调试用）
 """
 import argparse
 import json
@@ -20,7 +20,8 @@ from datetime import datetime, timezone, timedelta
 API_URL = os.environ.get("COLLECTOR_URL", "https://collector.255202.xyz")
 API_KEY = os.environ.get("API_KEY", "cbtc_2026_k3y")
 
-TZ = timezone(timedelta(hours=8))
+# 全链路统一北京时间
+CST = timezone(timedelta(hours=8))
 
 # 输出目录映射
 SCOPE_DIRS = {
@@ -28,13 +29,6 @@ SCOPE_DIRS = {
     "russia": "/Users/zijun/.openclaw/workspace-team/daily-article/russian-market/inbox",
     "selection": "/Users/zijun/.openclaw/workspace-team/daily-article/russian-market/inbox",
     "cross-border": "/Users/zijun/.openclaw/workspace-team/daily-article/inbox",
-}
-
-SCOPE_PREFIX = {
-    "tech": "",
-    "russia": "russia-",
-    "selection": "selection-",
-    "cross-border": "cb-",
 }
 
 CATEGORY_LABELS = {
@@ -73,9 +67,8 @@ def fetch_articles(scope: str, date_str: str) -> list:
 
 
 def build_inbox_md(articles: list, scope: str, date_str: str) -> str:
-    now = datetime.now(TZ).strftime("%Y-%m-%d %H:%M")
+    now = datetime.now(CST).strftime("%Y-%m-%d %H:%M")
 
-    # Group by category
     by_cat = {}
     for a in articles:
         cat = a.get("category", "other")
@@ -83,7 +76,6 @@ def build_inbox_md(articles: list, scope: str, date_str: str) -> str:
 
     lines = [f"## 素材包 · {scope} · {date_str} {now}", ""]
 
-    # Sort categories by defined order
     cat_order = list(CATEGORY_LABELS.keys())
     for cat in cat_order:
         if cat not in by_cat:
@@ -113,7 +105,6 @@ def build_inbox_md(articles: list, scope: str, date_str: str) -> str:
 
 
 def build_selection_json(articles: list) -> list:
-    """选品数据额外输出 JSON，保留链接和标签。"""
     import re
     results = []
     for a in articles:
@@ -137,22 +128,23 @@ def build_selection_json(articles: list) -> list:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="从统一采集服务拉取数据")
+    parser = argparse.ArgumentParser(description="从统一采集服务拉取数据（全链路北京时间）")
     parser.add_argument("--scope", choices=["tech", "russia", "selection", "cross-border"],
                         help="拉取哪个 scope 的数据")
     parser.add_argument("--all", action="store_true", help="拉取所有 scope")
     args = parser.parse_args()
 
     scopes = ["tech", "cross-border", "russia", "selection"] if args.all else [args.scope]
-    today_cst = datetime.now(TZ).strftime("%Y-%m-%d")
-    today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    # 统一用北京时间日期
+    today = datetime.now(CST).strftime("%Y-%m-%d")
 
     for scope in scopes:
         if not scope:
             continue
         print(f"\n{'='*50}")
-        print(f"📡 Pulling scope={scope}, date={today_utc}")
-        articles = fetch_articles(scope, today_utc)
+        print(f"📡 Pulling scope={scope}, date={today} (CST)")
+        articles = fetch_articles(scope, today)
         print(f"  Got {len(articles)} articles")
 
         if not articles:
@@ -162,27 +154,25 @@ def main():
         out_dir = SCOPE_DIRS.get(scope, "/tmp")
         os.makedirs(out_dir, exist_ok=True)
 
-        # Write markdown
-        prefix = SCOPE_PREFIX.get(scope, "")
-        md_path = os.path.join(out_dir, f"{today_cst}.md" if scope == "tech" else f"{today_cst}_{scope}.md")
+        if scope == "tech":
+            md_path = os.path.join(out_dir, f"{today}.md")
+        else:
+            md_path = os.path.join(out_dir, f"{today}_{scope}.md")
 
-        # For tech scope, we merge into existing daily file if it exists
         if scope == "tech" and os.path.exists(md_path):
-            # Append to existing file
-            content = build_inbox_md(articles, scope, today_cst)
+            content = build_inbox_md(articles, scope, today)
             with open(md_path, "a", encoding="utf-8") as f:
                 f.write("\n\n" + content + "\n")
         else:
-            content = build_inbox_md(articles, scope, today_cst)
+            content = build_inbox_md(articles, scope, today)
             with open(md_path, "w", encoding="utf-8") as f:
                 f.write(content + "\n")
 
         print(f"  ✅ Written {len(content)} bytes → {md_path}")
 
-        # Selection scope: also output JSON
         if scope == "selection":
             sel_data = build_selection_json(articles)
-            json_path = os.path.join(out_dir, f"{today_cst}_selection.json")
+            json_path = os.path.join(out_dir, f"{today}_selection.json")
             with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(sel_data, f, ensure_ascii=False, indent=2)
             print(f"  📦 Selection JSON: {len(sel_data)} items → {json_path}")
