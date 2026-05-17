@@ -127,6 +127,68 @@ def build_selection_json(articles: list) -> list:
     return results
 
 
+def build_ecom_products_md(articles: list, date_str: str) -> str:
+    """按 source 分组输出选品数据，兼容方远热卖好物初稿的输入格式。
+    格式：# 标题 > ## 频道名 > ### [时间] 标题 + 描述 + 链接
+    """
+    import re
+
+    # 按 source 分组
+    by_source = {}
+    for a in articles:
+        src = a.get("source", "unknown")
+        by_source.setdefault(src, []).append(a)
+
+    lines = [f"# 跨境电商选品参考 ({date_str})", ""]
+    lines.append(f"> 共 {len(articles)} 条")
+    lines.append("")
+
+    for src, items in by_source.items():
+        lines.append(f"## {src}")
+        lines.append("")
+        for a in items:
+            title = a.get("title", "").strip()
+            desc = a.get("summary", "").strip()
+            pub = a.get("published_at", "")
+            # 提取发布日期简写
+            pub_short = ""
+            if pub:
+                try:
+                    from email.utils import parsedate_to_datetime
+                    dt = parsedate_to_datetime(pub)
+                    pub_short = dt.strftime("%a,")
+                except Exception:
+                    pass
+
+            lines.append(f"### [{pub_short}] {title}")
+            lines.append("")
+            if desc:
+                lines.append(desc)
+                lines.append("")
+
+            # 提取链接
+            links = re.findall(r'https?://[^\s)"<>]+', desc)
+            url = a.get("url", "")
+            if url and url not in links:
+                links.insert(0, url)
+            if links:
+                lines.append("**链接:**")
+                for lnk in links[:10]:
+                    lines.append(f"- {lnk}")
+
+            # 标签
+            tags = re.findall(r'#\w+', desc)
+            if tags:
+                lines.append("")
+                lines.append(f"标签: {' '.join(set(tags))}")
+
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+
+    return "\n".join(lines)
+
+
 def main():
     parser = argparse.ArgumentParser(description="从统一采集服务拉取数据（全链路北京时间）")
     parser.add_argument("--scope", choices=["tech", "russia", "selection", "cross-border"],
@@ -168,14 +230,22 @@ def main():
             with open(md_path, "w", encoding="utf-8") as f:
                 f.write(content + "\n")
 
-        print(f"  ✅ Written {len(content)} bytes → {md_path}")
-
         if scope == "selection":
+            # 选品：用方远兼容格式，文件名为 _ecom_products.md
+            ecom_content = build_ecom_products_md(articles, today)
+            ecom_path = os.path.join(out_dir, f"{today}_ecom_products.md")
+            with open(ecom_path, "w", encoding="utf-8") as f:
+                f.write(ecom_content + "\n")
+            print(f"  ✅ Written {len(ecom_content)} bytes → {ecom_path}")
+
+            # JSON 也保留
             sel_data = build_selection_json(articles)
-            json_path = os.path.join(out_dir, f"{today}_selection.json")
+            json_path = os.path.join(out_dir, f"{today}_ecom_products.json")
             with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(sel_data, f, ensure_ascii=False, indent=2)
-            print(f"  📦 Selection JSON: {len(sel_data)} items → {json_path}")
+            print(f"  📦 JSON: {len(sel_data)} items → {json_path}")
+        else:
+            print(f"  ✅ Written {len(content)} bytes → {md_path}")
 
 
 if __name__ == "__main__":
