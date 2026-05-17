@@ -1,0 +1,135 @@
+"""API v1 routes - articles."""
+from datetime import datetime, timezone, timedelta
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func
+from typing import Optional
+
+from ..db import get_session, Article
+
+router = APIRouter(prefix="/api/v1", tags=["articles"])
+
+
+def _article_to_dict(a: Article) -> dict:
+    return {
+        "id": a.id,
+        "source": a.source,
+        "source_type": a.source_type,
+        "scope": a.scope,
+        "category": a.category,
+        "title": a.title,
+        "url": a.url,
+        "summary": a.summary or "",
+        "tags": a.tags or "",
+        "lang": a.lang or "en",
+        "published_at": a.published_at.isoformat() if a.published_at else None,
+        "fetched_at": a.fetched_at.isoformat() if a.fetched_at else None,
+    }
+
+
+@router.get("/articles")
+def list_articles(
+    date: Optional[str] = Query(None, description="Filter by date YYYY-MM-DD (uses fetched_at UTC)"),
+    scope: Optional[str] = Query(None, description="一级分类: tech | cross-border | russia | selection"),
+    category: Optional[str] = Query(None, description="二级分类（需配合 scope 使用）"),
+    source: Optional[str] = Query(None, description="按来源名称过滤"),
+    source_type: Optional[str] = Query(None, description="按来源类型: rss | rsshub | github_trending | telegram"),
+    lang: Optional[str] = Query(None, description="按语言: zh | en | ru"),
+    limit: int = Query(200, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+    session=Depends(get_session),
+):
+    """查询文章列表。
+
+    scope 是主要的隔离维度：
+    - scope=tech → 晨报脚本拿全部技术类
+    - scope=russia → 俄罗斯晨报拿全部俄罗斯类
+    - scope=selection → 选品雷达拿全部选品类
+    - scope=cross-border → 跨境日报拿跨境电商行业类
+    """
+    q = session.query(Article)
+    if date:
+        try:
+            d = datetime.strptime(date, "%Y-%m-%d")
+            start = datetime(d.year, d.month, d.day, tzinfo=timezone.utc)
+            end = start + timedelta(days=1)
+            q = q.filter(Article.fetched_at >= start, Article.fetched_at < end)
+        except ValueError:
+            raise HTTPException(400, "Invalid date format, use YYYY-MM-DD")
+    if scope:
+        q = q.filter(Article.scope == scope)
+    if category:
+        q = q.filter(Article.category == category)
+    if source:
+        q = q.filter(Article.source == source)
+    if source_type:
+        q = q.filter(Article.source_type == source_type)
+    if lang:
+        q = q.filter(Article.lang == lang)
+
+    total = q.count()
+    articles = q.order_by(Article.fetched_at.desc()).offset(offset).limit(limit).all()
+    return {
+        "total": total,
+        "offset": offset,
+        "limit": limit,
+        "scope": scope,
+        "category": category,
+        "articles": [_article_to_dict(a) for a in articles],
+    }
+
+
+@router.get("/articles/stats")
+def article_stats(
+    date: Optional[str] = Query(None),
+    scope: Optional[str] = Query(None),
+    session=Depends(get_session),
+):
+    """采集统计。按 scope + source 分组计数。"""
+    q = session.query(Article)
+    if date:
+        try:
+            d = datetime.strptime(date, "%Y-%m-%d")
+            start = datetime(d.year, d.month, d.day, tzinfo=timezone.utc)
+            end = start + timedelta(days=1)
+            q = q.filter(Article.fetched_at >= start, Article.fetched_at < end)
+        except ValueError:
+            raise HTTPException(400, "Invalid date format, use YYYY-MM-DD")
+    else:
+        q = q.filter(Article.fetched_at >= datetime.now(timezone.utc) - timedelta(days=1))
+    if scope:
+        q = q.filter(Article.scope == scope)
+
+    results = q.with_entities(
+        Article.scope, Article.source, Article.category, func.count(Article.id)
+    ).group_by(Article.scope, Article.source, Article.category).all()
+
+    by_scope = {}
+    by_source = {}
+    by_category = {}
+    total = 0
+    for scope_val, source, category, cnt in results:
+        by_scope[scope_val] = by_scope.get(scope_val, 0) + cnt
+        by_source[source] = by_source.get(source, 0) + cnt
+        by_category[category] = by_category.get(category, 0) + cnt
+        total += cnt
+
+    return {
+        "total": total,
+        "by_scope": by_scope,
+        "by_source": by_source,
+        "by_category": by_category,
+    }
+
+
+@router.get("/sources")
+def list_sources(session=Depends(get_session)):
+    """列出所有数据源及其类型和 scope。"""
+    results = session.query(
+        Article.source, Article.source_type, Article.scope, Article.category, func.count(Article.id)
+    ).group_by(Article.source, Article.source_type, Article.scope, Article.category).all()
+    return {
+        "sources": [
+            {"name": r[0], "type": r[1], "scope": r[2], "category": r[3], "count": r[4]}
+            for r in results
+        ]
+    }

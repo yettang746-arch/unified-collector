@@ -1,0 +1,582 @@
+# 统一采集服务 - 数据源配置
+# type: rss | rsshub | github_trending | telegram
+# scope: 一级分类（隔离下游，防止取错数据）
+# category: 二级分类（精细分组）
+# lang: zh | en | ru
+# enabled: true/false
+# filters: 关键词过滤（可选，命中任一即保留，空=全量）
+
+# ========== RSSHub 基础配置 ==========
+rsshub:
+  base_url: "https://rss.255202.xyz"  # CF Workers 反代 → VPS RSSHub
+  timeout: 20
+
+# ========== 两级分类体系 ==========
+# scope（一级）：下游按此隔离，不会拿错数据
+# category（二级）：精细分组，同 scope 内可再过滤
+#
+# 查询示例：
+#   GET /articles?scope=tech                → 晨报脚本拿全部技术类
+#   GET /articles?scope=russia              → 俄罗斯晨报拿全部俄罗斯类
+#   GET /articles?scope=selection           → 选品雷达拿全部选品类
+#   GET /articles?scope=russia&category=news → 精确到子类
+#
+scope_labels:
+  tech: "技术前沿"
+  cross-border: "跨境电商"
+  russia: "俄罗斯市场"
+  selection: "选品参考"
+
+category_labels:
+  # --- tech ---
+  ai-frontier: "AI前沿"
+  dev-daily: "开发者日报"
+  tech-industry: "科技产业"
+  # --- cross-border ---
+  industry: "跨境电商行业动态"
+  tools: "电商工具/平台更新"
+  # --- russia ---
+  news: "俄语热点"
+  economy: "俄罗斯经济"
+  business: "商业财经"
+  politics: "政治外交"
+  retail: "俄罗斯零售"
+  # --- selection ---
+  fashion: "时尚选品"
+  home: "家居百货选品"
+  deals: "折扣促销"
+  gadgets: "好物推荐"
+  wb-recommend: "WB好物推荐"
+  wb-fashion: "WB时尚穿搭"
+  wb-home: "WB家居装饰"
+  wb-deals: "WB折扣优惠"
+
+# ============================================================
+#  数据源定义
+# ============================================================
+sources:
+
+  # ==================== scope: tech ====================
+  # 下游：晨报素材采集 → AI前沿/开发者/科技频道
+
+  - name: "OpenAI Blog"
+    type: rss
+    url: "https://openai.com/news/rss.xml"
+    scope: tech
+    category: ai-frontier
+    lang: en
+    enabled: true
+
+  - name: "Hugging Face Blog"
+    type: rsshub
+    route: "/huggingface/blog"
+    scope: tech
+    category: ai-frontier
+    lang: en
+    enabled: true
+
+  - name: "MIT Tech Review"
+    type: rss
+    url: "https://www.technologyreview.com/feed/"
+    scope: tech
+    category: ai-frontier
+    lang: en
+    enabled: true
+
+  - name: "量子位"
+    type: rss
+    url: "https://www.qbitai.com/feed"
+    scope: tech
+    category: ai-frontier
+    lang: zh
+    enabled: true
+
+  - name: "arXiv CS.AI"
+    type: rss
+    url: "https://rss.arxiv.org/rss/cs.AI"
+    scope: tech
+    category: ai-frontier
+    lang: en
+    enabled: true
+    filters: ["LLM", "language model", "transformer", "AI", "commerce", "recommendation"]
+
+  - name: "arXiv CS.LG"
+    type: rss
+    url: "https://rss.arxiv.org/rss/cs.LG"
+    scope: tech
+    category: ai-frontier
+    lang: en
+    enabled: true
+    filters: ["LLM", "language model", "transformer", "AI", "commerce", "recommendation"]
+
+  - name: "Hacker News"
+    type: rss
+    url: "https://hnrss.org/frontpage"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+    filters: ["ecommerce", "shopify", "amazon", "payment", "logistics", "scraper", "translation", "localization", "marketplace", "retail", "AI", "LLM"]
+
+  - name: "GitHub Blog"
+    type: rss
+    url: "https://github.blog/feed/"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "GitHub Trending: Python"
+    type: github_trending
+    language: python
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "GitHub Trending: JavaScript"
+    type: github_trending
+    language: javascript
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "GitHub Trending: Go"
+    type: github_trending
+    language: go
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "GitHub Trending: Rust"
+    type: github_trending
+    language: rust
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "ByteByteGo"
+    type: rss
+    url: "https://blog.bytebytego.com/feed"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "The Pragmatic Engineer"
+    type: rss
+    url: "https://newsletter.pragmaticengineer.com/feed"
+    scope: tech
+    category: dev-daily
+    lang: en
+    enabled: true
+
+  - name: "阮一峰周刊"
+    type: rss
+    url: "https://feeds.feedburner.com/ruanyifeng"
+    scope: tech
+    category: dev-daily
+    lang: zh
+    enabled: true
+
+  - name: "TechCrunch"
+    type: rss
+    url: "https://techcrunch.com/feed/"
+    scope: tech
+    category: tech-industry
+    lang: en
+    enabled: true
+    filters: ["ecommerce", "retail", "marketplace", "cross-border", "AI", "commerce"]
+
+  - name: "The Verge"
+    type: rss
+    url: "https://www.theverge.com/rss/index.xml"
+    scope: tech
+    category: tech-industry
+    lang: en
+    enabled: true
+
+  - name: "36kr"
+    type: rss
+    url: "https://36kr.com/feed"
+    scope: tech
+    category: tech-industry
+    lang: zh
+    enabled: true
+    filters: ["出海", "跨境", "电商", "海外", "AI"]
+
+  - name: "钛媒体"
+    type: rss
+    url: "https://www.tmtpost.com/rss.xml"
+    scope: tech
+    category: tech-industry
+    lang: zh
+    enabled: true
+
+  # ==================== scope: cross-border ====================
+  # 下游：跨境日报、选品雷达
+
+  - name: "Modern Retail"
+    type: rss
+    url: "https://www.modernretail.co/feed/"
+    scope: cross-border
+    category: industry
+    lang: en
+    enabled: true
+
+  - name: "WooCommerce Dev Blog"
+    type: rss
+    url: "https://developer.woocommerce.com/feed/"
+    scope: cross-border
+    category: tools
+    lang: en
+    enabled: true
+
+  - name: "Retail Dive"
+    type: rss
+    url: "https://www.retaildive.com/feeds/news/"
+    scope: cross-border
+    category: industry
+    lang: en
+    enabled: true
+
+  - name: "亿恩网"
+    type: rss
+    url: "https://www.enec.com/rss"
+    scope: cross-border
+    category: industry
+    lang: zh
+    enabled: true
+
+  # ==================== scope: russia ====================
+  # 下游：俄罗斯市场晨报
+
+  # --- 直连 RSS ---
+  - name: "RIA Новости (RSS)"
+    type: rss
+    url: "https://ria.ru/export/rss2/index.xml"
+    scope: russia
+    category: news
+    lang: ru
+    enabled: true
+
+  - name: "Lenta.ru"
+    type: rss
+    url: "https://lenta.ru/rss"
+    scope: russia
+    category: news
+    lang: ru
+    enabled: true
+
+  - name: "Независимая Газета"
+    type: rss
+    url: "https://www.ng.ru/rss/"
+    scope: russia
+    category: news
+    lang: ru
+    enabled: true
+
+  - name: "The Moscow Times"
+    type: rss
+    url: "https://www.themoscowtimes.com/rss/news"
+    scope: russia
+    category: news
+    lang: en
+    enabled: true
+
+  - name: "Meduza (English)"
+    type: rss
+    url: "https://meduza.io/rss/en/all"
+    scope: russia
+    category: news
+    lang: en
+    enabled: true
+
+  # --- Telegram (RSSHub) ---
+  - name: "РИА Новости (TG)"
+    type: telegram
+    channel: "rian_ru"
+    scope: russia
+    category: news
+    lang: ru
+    enabled: true
+
+  - name: "РИА 经济"
+    type: telegram
+    channel: "rian_ru/economy"
+    scope: russia
+    category: economy
+    lang: ru
+    enabled: true
+
+  - name: "Коммерсантъ"
+    type: telegram
+    channel: "Kommersant"
+    scope: russia
+    category: business
+    lang: ru
+    enabled: true
+
+  - name: "Коммерсантъ 商业"
+    type: telegram
+    channel: "KommersantBusiness"
+    scope: russia
+    category: business
+    lang: ru
+    enabled: true
+
+  - name: "Взгляд"
+    type: telegram
+    channel: "vzglyad_news"
+    scope: russia
+    category: politics
+    lang: ru
+    enabled: true
+
+  - name: "Meduza (TG)"
+    type: telegram
+    channel: "meduza_news"
+    scope: russia
+    category: news
+    lang: ru
+    enabled: true
+
+  - name: "Дождь TV"
+    type: telegram
+    channel: "tvrain"
+    scope: russia
+    category: news
+    lang: ru
+    enabled: true
+
+  - name: "Ozon 官方新闻"
+    type: telegram
+    channel: "ozon_news"
+    scope: russia
+    category: retail
+    lang: ru
+    enabled: true
+
+  # ==================== scope: selection ====================
+  # 下游：选品参考、电商选品报告
+
+  # --- AliExpress 选品 ---
+  - name: "LizaProStyle (时尚)"
+    type: telegram
+    channel: "lizaprostyle"
+    scope: selection
+    category: fashion
+    lang: zh
+    enabled: true
+
+  - name: "AliExpress Халява"
+    type: telegram
+    channel: "alikzbs_aliexpress"
+    scope: selection
+    category: deals
+    lang: zh
+    enabled: true
+
+  - name: "Находки AliExpress"
+    type: telegram
+    channel: "aliexprs"
+    scope: selection
+    category: gadgets
+    lang: zh
+    enabled: true
+
+  - name: "База Али (男装)"
+    type: telegram
+    channel: "alimenspro"
+    scope: selection
+    category: fashion
+    lang: zh
+    enabled: true
+
+  - name: "ДЕРЖИ КИТАЙ"
+    type: telegram
+    channel: "derzhikitay"
+    scope: selection
+    category: deals
+    lang: zh
+    enabled: true
+
+  - name: "Скидки WB/Ozon"
+    type: telegram
+    channel: "skidki_ozon_wb_mm"
+    scope: selection
+    category: deals
+    lang: zh
+    enabled: true
+
+  - name: "AliExpress дом"
+    type: telegram
+    channel: "aliexdom"
+    scope: selection
+    category: fashion
+    lang: zh
+    enabled: true
+
+  - name: "AliExpress 家居好物"
+    type: telegram
+    channel: "aliehome"
+    scope: selection
+    category: home
+    lang: zh
+    enabled: true
+
+  - name: "Домашний Али"
+    type: telegram
+    channel: "aliexpress4home"
+    scope: selection
+    category: home
+    lang: zh
+    enabled: true
+
+  - name: "Идеи для дома WB/Ozon"
+    type: telegram
+    channel: "dlya_doma_wb_ozon"
+    scope: selection
+    category: home
+    lang: zh
+    enabled: true
+
+  - name: "Сундук Али-Бабы"
+    type: telegram
+    channel: "sunduk_aliexpress"
+    scope: selection
+    category: home
+    lang: zh
+    enabled: true
+
+  - name: "Халявщики Ali"
+    type: telegram
+    channel: "halyavshikiali"
+    scope: selection
+    category: deals
+    lang: zh
+    enabled: true
+
+  - name: "AliWithRon (厨房)"
+    type: telegram
+    channel: "aliwithron"
+    scope: selection
+    category: home
+    lang: zh
+    enabled: true
+
+  - name: "ALLA pro ALI"
+    type: telegram
+    channel: "allaproa"
+    scope: selection
+    category: fashion
+    lang: zh
+    enabled: true
+
+  # --- WB/Wildberries ---
+  - name: "WB 多平台发现"
+    type: telegram
+    channel: "top_nahodki_wb"
+    scope: selection
+    category: wb-recommend
+    lang: zh
+    enabled: true
+
+  - name: "视频中的秘密SKU"
+    type: telegram
+    channel: "wb_artikuly"
+    scope: selection
+    category: wb-recommend
+    lang: zh
+    enabled: true
+
+  - name: "WB 便宜时髦衣服"
+    type: telegram
+    channel: "fashion_wb"
+    scope: selection
+    category: wb-fashion
+    lang: zh
+    enabled: true
+
+  - name: "WB 家居装饰+每日低价"
+    type: telegram
+    channel: "wb_doma"
+    scope: selection
+    category: wb-home
+    lang: zh
+    enabled: true
+
+  - name: "WB&Ozon 家居灵感"
+    type: telegram
+    channel: "ozon_wb_nahodki"
+    scope: selection
+    category: wb-home
+    lang: zh
+    enabled: true
+
+  - name: "AliExpress/WB/Ozon 综合"
+    type: telegram
+    channel: "alie_ba_ba"
+    scope: selection
+    category: wb-recommend
+    lang: zh
+    enabled: true
+
+  - name: "WB/Ozon 精选好物"
+    type: telegram
+    channel: "wbozonmarkett"
+    scope: selection
+    category: wb-recommend
+    lang: zh
+    enabled: true
+
+  - name: "多平台综合发现"
+    type: telegram
+    channel: "marketplace_nahodki"
+    scope: selection
+    category: wb-recommend
+    lang: zh
+    enabled: true
+
+  - name: "WB 舒适家居好物"
+    type: telegram
+    channel: "comfort_wb"
+    scope: selection
+    category: wb-home
+    lang: zh
+    enabled: true
+
+  - name: "Shopping Home 多平台"
+    type: telegram
+    channel: "alik_home"
+    scope: selection
+    category: wb-home
+    lang: zh
+    enabled: true
+
+  - name: "WB/Ozon 时尚穿搭"
+    type: telegram
+    channel: "wildberriesstilnyi"
+    scope: selection
+    category: wb-fashion
+    lang: zh
+    enabled: true
+
+  - name: "WB 大幅折扣监控"
+    type: telegram
+    channel: "wb_discount"
+    scope: selection
+    category: wb-deals
+    lang: zh
+    enabled: true
+
+  - name: "WB/Ozon 折扣好物"
+    type: telegram
+    channel: "wildberriesozonobzor"
+    scope: selection
+    category: wb-deals
+    lang: zh
+    enabled: true
