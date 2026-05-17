@@ -45,10 +45,16 @@ def parse_rss_xml(raw: str) -> List[Dict[str, Any]]:
         t = _get_text(item.find("title"))
         l = _get_text(item.find("link"))
         d_el = item.find("description")
-        d = re.sub(r"<[^>]+>", "", (d_el.text or "") if d_el is not None else "").strip()[:500]
+        d_raw = (d_el.text or "") if d_el is not None else ""
+        d = re.sub(r"<[^>]+>", "", d_raw).strip()[:500]
+        # 提取图片 URL
+        images = re.findall(r'<img[^>]+src=["\']([^"\'>]+)["\']', d_raw)
         p = _get_text(item.find("pubDate"))
         if t and l:
-            items.append({"title": t, "url": l, "summary": d, "published_at": p})
+            item_dict = {"title": t, "url": l, "summary": d, "published_at": p}
+            if images:
+                item_dict["images"] = images
+            items.append(item_dict)
 
     # Atom
     if not items:
@@ -58,11 +64,16 @@ def parse_rss_xml(raw: str) -> List[Dict[str, Any]]:
             l_el = entry.find('atom:link[@rel="alternate"]', ns) or entry.find("atom:link", ns)
             l = _get_link(l_el)
             d_el = entry.find("atom:summary", ns) or entry.find("atom:content", ns)
-            d = re.sub(r"<[^>]+>", "", (d_el.text or "") if d_el is not None else "").strip()[:500]
+            d_raw = (d_el.text or "") if d_el is not None else ""
+            d = re.sub(r"<[^>]+>", "", d_raw).strip()[:500]
+            images = re.findall(r'<img[^>]+src=["\']([^"\'>]+)["\']', d_raw)
             p_el = entry.find("atom:published", ns) or entry.find("atom:updated", ns)
             p = _get_text(p_el)
             if t and l:
-                items.append({"title": t, "url": l, "summary": d, "published_at": p})
+                item_dict = {"title": t, "url": l, "summary": d, "published_at": p}
+                if images:
+                    item_dict["images"] = images
+                items.append(item_dict)
 
     return items
 

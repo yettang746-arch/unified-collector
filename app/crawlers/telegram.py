@@ -1,5 +1,6 @@
 """Telegram channel crawler via RSSHub."""
 import re
+import json
 import urllib.request
 import ssl
 import certifi
@@ -24,17 +25,24 @@ class TelegramCrawler(BaseCrawler):
             print(f"  ERROR TG {self.name}: {e}")
             return []
 
-        # Reuse RSS parser
         from .rss import parse_rss_xml
         items = parse_rss_xml(raw)
 
-        # Enrich with extracted links from description
         for it in items:
             desc = it.get("summary", "")
-            # Extract product links from Telegram messages
+            images = it.get("images", [])
+
+            # 提取商品链接
             links = re.findall(r'https?://[^\s)"<>]+', desc)
+
+            # 构造 raw_content：包含图片 + 链接
+            raw = {}
+            if images:
+                raw["images"] = images
             if links:
-                it["raw_content"] = "\n".join(links)
+                raw["links"] = links
+            if raw:
+                it["raw_content"] = json.dumps(raw, ensure_ascii=False)
 
         if self.filters:
             items = [it for it in items if self.apply_filters(it["title"] + " " + it.get("summary", ""))]

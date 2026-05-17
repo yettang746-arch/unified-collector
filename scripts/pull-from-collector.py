@@ -121,6 +121,7 @@ def build_selection_json(articles: list) -> list:
             "desc": desc,
             "link": url,
             "links": links,
+            "images": images if 'images' in dir() else [],
             "tags": list(set(tags)),
             "pub": a.get("published_at", ""),
         })
@@ -162,6 +163,22 @@ def build_ecom_products_md(articles: list, date_str: str) -> str:
 
             lines.append(f"### [{pub_short}] {title}")
             lines.append("")
+
+            # 图片（从 raw_content 提取）
+            images = []
+            raw_content = a.get("raw_content", "")
+            if raw_content:
+                try:
+                    import json as _json
+                    rc = _json.loads(raw_content)
+                    images = rc.get("images", [])
+                except Exception:
+                    pass
+            if images:
+                for img in images[:3]:
+                    lines.append(f"![img]({img})")
+                lines.append("")
+
             if desc:
                 lines.append(desc)
                 lines.append("")
