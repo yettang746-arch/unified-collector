@@ -20,6 +20,7 @@ class Article(Base):
     title = Column(Text, nullable=False)
     url = Column(Text, nullable=False, unique=True)
     summary = Column(Text)
+    full_text = Column(Text)  # 原文全文（仅RSS文章，TG帖子summary即全文）
     tags = Column(Text)  # JSON array string
     lang = Column(String(5), default="en")
     published_at = Column(DateTime)

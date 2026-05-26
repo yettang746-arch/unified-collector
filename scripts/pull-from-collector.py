@@ -53,14 +53,32 @@ CATEGORY_LABELS = {
 }
 
 
+def _ssl_ctx():
+    ctx = ssl.create_default_context()
+    ctx.set_ciphers("DEFAULT:@SECLEVEL=1")
+    return ctx
+
 def fetch_articles(scope: str, date_str: str) -> list:
     url = f"{API_URL}/api/v1/articles?scope={scope}&date={date_str}&limit=500"
+    # Prefer curl (avoids Python SSL issues on some hosts)
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["curl", "-sS", "-m", "30", "-H", f"Authorization: Bearer {API_KEY}", url],
+            capture_output=True, text=True, timeout=35
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            data = json.loads(result.stdout)
+            return data.get("articles", [])
+    except Exception:
+        pass
+    # Fallback to urllib
     req = urllib.request.Request(url, headers={
         "Authorization": f"Bearer {API_KEY}",
         "Accept": "application/json",
         "User-Agent": "curl/8.0.0"
     })
-    ctx = ssl.create_default_context()
+    ctx = _ssl_ctx()
     with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:
         data = json.loads(resp.read())
     return data.get("articles", [])
@@ -88,14 +106,23 @@ def build_inbox_md(articles: list, scope: str, date_str: str) -> str:
             summary = (a.get("summary") or "").strip()[:150]
             url = a.get("url", "").strip()
             source = a.get("source", "")
+            source_type = a.get("source_type", "")
             lang = a.get("lang", "")
             flag = {"ru": "🇷🇺", "zh": "🇨🇳", "en": "🇬🇧"}.get(lang, "")
 
             lines.append(f"- {flag} **{title}**")
             if source:
                 lines.append(f"  来源：{source}")
-            if summary:
+
+            # 优先用API返回的full_text（VPS采集时已抓），没有则fallback到summary
+            full_text = (a.get("full_text") or "").strip()
+            summary = (a.get("summary") or "").strip()[:150]
+
+            if full_text:
+                lines.append(f"  原文：{full_text}")
+            elif summary:
                 lines.append(f"  摘要：{summary}")
+
             if url:
                 lines.append(f"  链接：{url}")
             lines.append("")
@@ -141,10 +168,21 @@ def build_selection_json(articles: list, img_map: dict = None) -> list:
 
 def _download_image(url: str, save_path: str) -> bool:
     """下载图片到本地，返回是否成功。"""
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["curl", "-sS", "-m", "5", "-o", save_path, url],
+            capture_output=True, timeout=8
+        )
+        if result.returncode == 0 and os.path.exists(save_path) and os.path.getsize(save_path) > 100:
+            return True
+    except Exception:
+        pass
+    # Fallback to urllib
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        ctx = ssl.create_default_context()
-        with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
+        ctx = _ssl_ctx()
+        with urllib.request.urlopen(req, timeout=5, context=ctx) as resp:
             if resp.status == 200:
                 with open(save_path, "wb") as f:
                     f.write(resp.read())
@@ -155,11 +193,19 @@ def _download_image(url: str, save_path: str) -> bool:
 
 
 def _download_article_images(articles: list, img_dir: str) -> dict:
-    """批量下载文章图片到指定目录，返回 {article_index: [local_paths]}。"""
+    """批量下载文章图片到指定目录（并发+总超时），返回 {article_index: [local_paths]}。"""
+    import time as _time
+    from concurrent.futures import ThreadPoolExecutor
+
+    IMG_WORKERS = 10          # 并发数
+    TOTAL_DEADLINE = 90       # 总超时（秒），防止无限卡住
+    MAX_IMGS_PER_ITEM = 3     # 每条最多几张
+
     os.makedirs(img_dir, exist_ok=True)
     result = {}
     total = 0
-    ok = 0
+    tasks = []  # (idx, img_url, save_path)
+
     for idx, a in enumerate(articles):
         images = []
         raw_content = a.get("raw_content", "")
@@ -171,10 +217,8 @@ def _download_article_images(articles: list, img_dir: str) -> dict:
                 pass
         if not images:
             continue
-        local_paths = []
         src = a.get("source", "unknown").replace("/", "_").replace(" ", "_")[:30]
-        for i, img_url in enumerate(images[:3]):  # 每条最多3张
-            total += 1
+        for i, img_url in enumerate(images[:MAX_IMGS_PER_ITEM]):
             ext = ".jpg"
             if ".png" in img_url:
                 ext = ".png"
@@ -183,14 +227,42 @@ def _download_article_images(articles: list, img_dir: str) -> dict:
             filename = f"{src}_{idx}_{i}{ext}"
             save_path = os.path.join(img_dir, filename)
             if os.path.exists(save_path):
-                local_paths.append(save_path)
+                result.setdefault(idx, []).append(save_path)
+            else:
+                total += 1
+                tasks.append((idx, img_url, save_path))
+
+    if not tasks:
+        existing = sum(len(v) for v in result.values())
+        print(f"  📷 图片已全部存在 ({existing} 张)")
+        return result
+
+    print(f"  📷 下载 {len(tasks)} 张图片（并发 {IMG_WORKERS}，总超时 {TOTAL_DEADLINE}s）...")
+    start = _time.monotonic()
+    ok = 0
+    fail = 0
+
+    with ThreadPoolExecutor(max_workers=IMG_WORKERS) as pool:
+        futures = {pool.submit(_download_image, url, path): (idx, path) for idx, url, path in tasks}
+        for fut in list(futures):
+            remaining = TOTAL_DEADLINE - (_time.monotonic() - start)
+            if remaining <= 0:
+                print(f"  ⚠️ 图片下载总超时，已处理 {ok+fail}/{len(tasks)}")
+                pool.shutdown(wait=False, cancel_futures=True)
+                break
+            idx, path = futures[fut]
+            try:
+                success = fut.result(timeout=max(remaining, 1))
+            except Exception:
+                success = False
+            if success:
                 ok += 1
-            elif _download_image(img_url, save_path):
-                local_paths.append(save_path)
-                ok += 1
-        if local_paths:
-            result[idx] = local_paths
-    print(f"  📷 图片: {ok}/{total} 下载成功 → {img_dir}")
+                result.setdefault(idx, []).append(path)
+            else:
+                fail += 1
+
+    existing = sum(len(v) for v in result.values())
+    print(f"  📷 图片: {ok} 新下载, {fail} 失败 | 总计: {existing} 张 → {img_dir}")
     return result
 
 
@@ -314,10 +386,19 @@ def main():
         out_dir = SCOPE_DIRS.get(scope, "/tmp")
         os.makedirs(out_dir, exist_ok=True)
 
+        # russian-market inbox 按日期分目录
+        if scope in ("russia", "selection"):
+            day_dir = os.path.join(out_dir, today)
+            os.makedirs(day_dir, exist_ok=True)
+        else:
+            day_dir = out_dir
+
         if scope == "tech":
             md_path = os.path.join(out_dir, f"{today}.md")
+        elif scope == "russia":
+            md_path = os.path.join(day_dir, "russia.md")
         else:
-            md_path = os.path.join(out_dir, f"{today}_{scope}.md")
+            md_path = os.path.join(day_dir, f"{today}_{scope}.md")
 
         if scope == "tech" and os.path.exists(md_path):
             content = build_inbox_md(articles, scope, today)
@@ -330,18 +411,18 @@ def main():
 
         if scope == "selection":
             # 选品：先下载图片，再用方远兼容格式输出
-            img_dir = os.path.join(out_dir, "images", today)
+            img_dir = os.path.join(day_dir, "images")
             img_map = _download_article_images(articles, img_dir)
 
             ecom_content = build_ecom_products_md(articles, today, img_map)
-            ecom_path = os.path.join(out_dir, f"{today}_ecom_products.md")
+            ecom_path = os.path.join(day_dir, f"{today}_ecom_products.md")
             with open(ecom_path, "w", encoding="utf-8") as f:
                 f.write(ecom_content + "\n")
             print(f"  ✅ Written {len(ecom_content)} bytes → {ecom_path}")
 
             # JSON 也保留
             sel_data = build_selection_json(articles, img_map)
-            json_path = os.path.join(out_dir, f"{today}_ecom_products.json")
+            json_path = os.path.join(day_dir, f"{today}_ecom_products.json")
             with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(sel_data, f, ensure_ascii=False, indent=2)
             print(f"  📦 JSON: {len(sel_data)} items → {json_path}")

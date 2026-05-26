@@ -10,6 +10,48 @@ from .crawlers import create_crawler
 from .db import get_session, Article
 
 
+def _fetch_full_text(url: str, timeout: int = 10) -> str:
+    """抓取RSS文章原文全文，返回纯文本（最多2000字）。失败返回空字符串。"""
+    import subprocess
+    import re
+    try:
+        result = subprocess.run(
+            ["curl", "-sS", "-L", "-m", str(timeout),
+             "-H", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+             url],
+            capture_output=True, text=True, timeout=timeout + 5
+        )
+        html = result.stdout
+    except Exception:
+        return ""
+    if not html or len(html) < 200:
+        return ""
+    # 去掉 script/style/header/footer/nav/aside
+    html = re.sub(r'<(script|style|header|footer|nav|aside)[^>]*>.*?</\\1>', '', html, flags=re.S|re.I)
+    # 尝试找 <article> 或 main 或 content 区域
+    content_html = ""
+    m = re.search(
+        r'<(?:article|main)[^>]*>(.*?)</(?:article|main)>',
+        html, re.S | re.I
+    )
+    if m:
+        content_html = m.group(1)
+    if not content_html:
+        # 尝试找 class 含 content/article/post/entry 的 div
+        m = re.search(
+            r'<div[^>]*class="[^"]*(?:content|article|post|entry)[^"]*"[^>]*>(.*?)</div>',
+            html, re.S | re.I
+        )
+        if m and len(m.group(1)) > 500:
+            content_html = m.group(1)
+    if content_html:
+        text = re.sub(r'<[^>]+>', ' ', content_html)
+    else:
+        text = re.sub(r'<[^>]+>', ' ', html)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text[:2000]
+
+
 def load_config(config_path: str = None) -> Dict[str, Any]:
     import os
     if config_path is None:
@@ -93,6 +135,13 @@ def collect_all(config_path: str = None) -> Dict[str, Any]:
                 continue
 
             src_cfg = item["_source_config"]
+            source_type = item["_source_type"]
+
+            # RSS文章抓原文；TG帖子的summary即全文，不需要
+            full_text = ""
+            if source_type == "rss":
+                full_text = _fetch_full_text(url)
+
             article = Article(
                 source=src_cfg["name"],
                 source_type=item["_source_type"],
@@ -101,6 +150,7 @@ def collect_all(config_path: str = None) -> Dict[str, Any]:
                 title=item.get("title", "").strip(),
                 url=url,
                 summary=item.get("summary", "").strip()[:1000],
+                full_text=full_text,
                 tags=item.get("tags", ""),
                 lang=item["_lang"],
                 published_at=_parse_published_at(item.get("published_at", "")),
