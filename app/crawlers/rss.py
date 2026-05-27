@@ -46,9 +46,12 @@ def parse_rss_xml(raw: str) -> List[Dict[str, Any]]:
         l = _get_text(item.find("link"))
         d_el = item.find("description")
         d_raw = (d_el.text or "") if d_el is not None else ""
-        d = re.sub(r"<[^>]+>", "", d_raw).strip()[:500]
-        # 提取图片 URL
-        images = re.findall(r'<img[^>]+src=["\']([^"\'>]+)["\']', d_raw)
+        # RSSHub 返回的 description 可能含 HTML 实体编码，先解码
+        import html as _html
+        d_decoded = _html.unescape(d_raw)
+        d = re.sub(r"<[^>]+>", "", d_decoded).strip()[:500]
+        # 提取图片 URL（在解码后的 HTML 上匹配）
+        images = re.findall(r'<img[^>]+src=["\']([^"\'>]+)["\']', d_decoded)
         p = _get_text(item.find("pubDate"))
         if t and l:
             item_dict = {"title": t, "url": l, "summary": d, "published_at": p}
@@ -65,8 +68,10 @@ def parse_rss_xml(raw: str) -> List[Dict[str, Any]]:
             l = _get_link(l_el)
             d_el = entry.find("atom:summary", ns) or entry.find("atom:content", ns)
             d_raw = (d_el.text or "") if d_el is not None else ""
-            d = re.sub(r"<[^>]+>", "", d_raw).strip()[:500]
-            images = re.findall(r'<img[^>]+src=["\']([^"\'>]+)["\']', d_raw)
+            import html as _html
+            d_decoded = _html.unescape(d_raw)
+            d = re.sub(r"<[^>]+>", "", d_decoded).strip()[:500]
+            images = re.findall(r'<img[^>]+src=["\']([^"\'>]+)["\']', d_decoded)
             p_el = entry.find("atom:published", ns) or entry.find("atom:updated", ns)
             p = _get_text(p_el)
             if t and l:
