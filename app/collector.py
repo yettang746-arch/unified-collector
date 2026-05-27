@@ -52,6 +52,29 @@ def _fetch_full_text(url: str, timeout: int = 10) -> str:
     return text[:2000]
 
 
+def _is_valid_full_text(text: str) -> bool:
+    """质检：检测 Cloudflare 挑战页、JS乱码、纯URL等无效正文。"""
+    if not text or len(text) < 100:
+        return False
+    t = text.lower()
+    invalid_patterns = [
+        "enable javascript and cookies to continue",
+        "window._cf_chl_opt",
+        ".logo{margin",
+        "lock,.logo{display",
+        "cf_chl_rt_tk",
+        "member exclusive",
+        "cookies to continue",
+    ]
+    for p in invalid_patterns:
+        if p in t:
+            return False
+    # 检测纯URL/哈希串（无实质内容）
+    if len(text) < 300:
+        return False
+    return True
+
+
 def load_config(config_path: str = None) -> Dict[str, Any]:
     import os
     if config_path is None:
@@ -140,7 +163,9 @@ def collect_all(config_path: str = None) -> Dict[str, Any]:
             # RSS文章抓原文；TG帖子的summary即全文，不需要
             full_text = ""
             if source_type == "rss":
-                full_text = _fetch_full_text(url)
+                raw_ft = _fetch_full_text(url)
+                if _is_valid_full_text(raw_ft):
+                    full_text = raw_ft
 
             article = Article(
                 source=src_cfg["name"],
