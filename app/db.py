@@ -1,10 +1,23 @@
 """Database setup and models."""
 import os
-from sqlalchemy import create_engine, Column, Integer, Text, String, DateTime, Index
+from sqlalchemy import create_engine, event, Column, Integer, Text, String, DateTime, Index
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 DB_PATH = os.environ.get("DB_PATH", "/app/data/collector.db")
-engine = create_engine(f"sqlite:///{DB_PATH}", echo=False)
+engine = create_engine(
+    f"sqlite:///{DB_PATH}",
+    echo=False,
+    connect_args={"check_same_thread": False},
+)
+
+@event.listens_for(engine, "connect")
+def _set_sqlite_pragmas(dbapi_connection, connection_record):
+    """Enable WAL mode + busy timeout on every new connection."""
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL")
+    cursor.execute("PRAGMA busy_timeout=5000")
+    cursor.close()
+
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
 

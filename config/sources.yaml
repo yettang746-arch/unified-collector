@@ -696,8 +696,6 @@ sources:
   category: wb-deals
   lang: zh
   enabled: true
-
-# === WB 美妆 (wb-beauty) ===
 - name: WB 美妆推荐
   type: telegram
   channel: krasota_wb
@@ -719,8 +717,6 @@ sources:
   category: wb-beauty
   lang: ru
   enabled: true
-
-# === WB 母婴 (wb-kids) ===
 - name: WB 儿童好物
   type: telegram
   channel: forkids_wb
@@ -749,8 +745,6 @@ sources:
   category: wb-kids
   lang: ru
   enabled: true
-
-# === WB 综合补充 ===
 - name: WB/OZON 综合发现
   type: telegram
   channel: wb_nahodki
@@ -772,8 +766,6 @@ sources:
   category: wb-recommend
   lang: ru
   enabled: true
-
-# === WB 折扣补充 ===
 - name: WB 优惠推荐
   type: telegram
   channel: skidki_wb
