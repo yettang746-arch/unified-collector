@@ -563,13 +563,6 @@ sources:
   category: dev-daily
   lang: en
   enabled: true
-- name: Netflix TechBlog
-  type: rss
-  url: https://netflixtechblog.com/feed/
-  scope: tech
-  category: dev-daily
-  lang: en
-  enabled: true
 - name: Airbnb Engineering
   type: rss
   url: https://medium.com/feed/airbnb-engineering
