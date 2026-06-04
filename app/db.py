@@ -1,22 +1,31 @@
 """Database setup and models."""
 import os
+import time
 from sqlalchemy import create_engine, event, Column, Integer, Text, String, DateTime, Index
 from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.exc import OperationalError
 
-DB_PATH = os.environ.get("DB_PATH", "/app/data/collector.db")
-engine = create_engine(
-    f"sqlite:///{DB_PATH}",
-    echo=False,
-    connect_args={"check_same_thread": False},
-)
+DB_URL = os.environ.get("DB_URL", "")
 
-@event.listens_for(engine, "connect")
-def _set_sqlite_pragmas(dbapi_connection, connection_record):
-    """Enable WAL mode + busy timeout on every new connection."""
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA journal_mode=WAL")
-    cursor.execute("PRAGMA busy_timeout=5000")
-    cursor.close()
+if DB_URL:
+    # PostgreSQL mode (production)
+    engine = create_engine(DB_URL, echo=False, pool_size=20, max_overflow=10)
+else:
+    # SQLite mode (dev / legacy)
+    DB_PATH = os.environ.get("DB_PATH", "/app/data/collector.db")
+    engine = create_engine(
+        f"sqlite:///{DB_PATH}",
+        echo=False,
+        connect_args={"check_same_thread": False},
+    )
+
+    @event.listens_for(engine, "connect")
+    def _set_sqlite_pragmas(dbapi_connection, connection_record):
+        """Enable WAL mode + busy timeout on every new connection."""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA busy_timeout=5000")
+        cursor.close()
 
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
@@ -58,3 +67,18 @@ def get_session():
         yield session
     finally:
         session.close()
+
+
+def commit_with_retry(session, max_retries=3):
+    """Commit with exponential backoff for transient DB errors."""
+    for attempt in range(max_retries):
+        try:
+            session.commit()
+            return
+        except OperationalError:
+            if attempt < max_retries - 1:
+                sleep_sec = 2 ** attempt
+                time.sleep(sleep_sec)
+                session.rollback()
+            else:
+                raise

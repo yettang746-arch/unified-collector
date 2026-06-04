@@ -139,7 +139,7 @@ def collect_all(config_path: str = None) -> Dict[str, Any]:
                 print(f"  ❌ {src['name']}: {e}")
 
     # Store to DB
-    from .db import SessionLocal
+    from .db import SessionLocal, commit_with_retry
     # 全链路统一北京时间（CST = UTC+8）
     cst = timezone(timedelta(hours=8))
     now = datetime.now(cst)
@@ -185,7 +185,7 @@ def collect_all(config_path: str = None) -> Dict[str, Any]:
             session.add(article)
             stored += 1
 
-        session.commit()
+        commit_with_retry(session)
         stats["total_stored"] = stored
         stats["total_skipped"] = skipped
     except Exception as e:
