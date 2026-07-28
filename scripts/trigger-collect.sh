@@ -23,7 +23,9 @@ TMP_RESP="$(mktemp -t collect-resp.XXXXXX.json)"
 trap 'rm -f "$TMP_RESP"' EXIT
 
 # 触发采集：失败立即报错，不静默继续
-if ! curl -sfS -m 60 \
+# timeout 设 180s：90+ 源全量采集（含 RSSHub TG）正常 60-90s，
+# 容器重启后首次可能 100-150s（启动 N 个 crawler 进程）
+if ! curl -sfS -m 180 \
     -X POST "${API_URL}/api/v1/collect" \
     -H "Authorization: Bearer ${API_KEY}" \
     -H "Content-Type: application/json" \
