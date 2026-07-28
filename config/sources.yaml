@@ -773,3 +773,2292 @@ sources:
   category: wb-deals
   lang: ru
   enabled: true
+- name: TG AlexKvazis_UA
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: AlexKvazis_UA
+- name: TG Ali_for_men4
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Ali_for_men4
+- name: TG Aliexpress_devices
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Aliexpress_devices
+- name: TG AnycubicHelp
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: AnycubicHelp
+- name: TG BPrices
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: BPrices
+- name: TG BafistaRU
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: BafistaRU
+- name: TG CoffeaTee
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: CoffeaTee
+- name: TG Conclusive_Project
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Conclusive_Project
+- name: TG Dailysales
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Dailysales
+- name: TG Dar_ali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Dar_ali
+- name: TG KVPokupok
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: KVPokupok
+- name: TG MiniStl
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: MiniStl
+- name: TG ModGear
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ModGear
+- name: TG OneBoxTwoBox
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: OneBoxTwoBox
+- name: TG Pirate_Gram
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Pirate_Gram
+- name: TG Promo_Hod
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Promo_Hod
+- name: TG RealTechru
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: RealTechru
+- name: TG RealUpdatesTech
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: RealUpdatesTech
+- name: TG Reka_APK
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Reka_APK
+- name: TG Russian_Makers_3D
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Russian_Makers_3D
+- name: TG Simplyrobots
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Simplyrobots
+- name: TG TechnoReview07
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: TechnoReview07
+- name: TG TytDeshevle
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: TytDeshevle
+- name: TG alexandr_kames
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: alexandr_kames
+- name: TG ali_promik
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ali_promik
+- name: TG ali_stallions
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ali_stallions
+- name: TG ali_tehnology
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ali_tehnology
+- name: TG aliexpressgeeks
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliexpressgeeks
+- name: TG alikupon2020
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: alikupon2020
+- name: TG alliobzor
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: alliobzor
+- name: TG anzar3d
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: anzar3d
+- name: TG anzar3d_home
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: anzar3d_home
+- name: TG anzar3d_shop
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: anzar3d_shop
+- name: TG appleinside
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: appleinside
+- name: TG best_ot_aliexpress
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: best_ot_aliexpress
+- name: TG buy_fox
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: buy_fox
+- name: TG chalyavaRus
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: chalyavaRus
+- name: TG cheap4me
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: cheap4me
+- name: TG chemizar
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: chemizar
+- name: TG china_hardware
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: china_hardware
+- name: TG chinagadgetsofficial
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: chinagadgetsofficial
+- name: TG chtobratssoboy
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: chtobratssoboy
+- name: TG chxeon1
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: chxeon1
+- name: TG club3Dlab
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: club3Dlab
+- name: TG discountfeed
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: discountfeed
+- name: TG evgenmt
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: evgenmt
+- name: TG fa_electronics
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: fa_electronics
+- name: TG fa_sales
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: fa_sales
+- name: TG flexbanana
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: flexbanana
+- name: TG fpspc_ekb
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: fpspc_ekb
+- name: TG free_of_ali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: free_of_ali
+- name: TG free_ship
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: free_ship
+- name: TG gearbest_kupon
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: gearbest_kupon
+- name: TG hamradioshop73
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: hamradioshop73
+- name: TG iconicali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: iconicali
+- name: TG iinstrum
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: iinstrum
+- name: TG instumentalov
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: instumentalov
+- name: TG interesnoevs
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: interesnoevs
+- name: TG ironmanexpress
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ironmanexpress
+- name: TG ironmaninfo
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ironmaninfo
+- name: TG ishopper
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ishopper
+- name: TG katrin4ik_ali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: katrin4ik_ali
+- name: TG kinder_guide
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: kinder_guide
+- name: TG kitay99
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: kitay99
+- name: TG kitayblizko
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: kitayblizko
+- name: TG korolevww
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: korolevww
+- name: TG kpsale
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: kpsale
+- name: TG krazzz_3d
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: krazzz_3d
+- name: TG krytoitovar
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: krytoitovar
+- name: TG lifehackerru
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: lifehackerru
+- name: TG madechinacom
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: madechinacom
+- name: TG man_gadgets
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: man_gadgets
+- name: TG man_product
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: man_product
+- name: TG mancave
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mancave
+- name: TG mangadgets
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mangadgets
+- name: TG markettt_skidok
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: markettt_skidok
+- name: TG megacashbacks
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: megacashbacks
+- name: TG megasborka_all
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: megasborka_all
+- name: TG megasborku
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: megasborku
+- name: TG mensaliexress
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mensaliexress
+- name: TG mijia_news
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mijia_news
+- name: TG mijia_shop
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mijia_shop
+- name: TG mm_promokode
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mm_promokode
+- name: TG mobiler_youtube
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mobiler_youtube
+- name: TG modnox
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: modnox
+- name: TG moregadetov
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: moregadetov
+- name: TG mpokupki
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mpokupki
+- name: TG nahalyavu
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: nahalyavu
+- name: TG nahody_ali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: nahody_ali
+- name: TG nashli_za_vas
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: nashli_za_vas
+- name: TG naydema1
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: naydema1
+- name: TG nizherynka
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: nizherynka
+- name: TG otomosem
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: otomosem
+- name: TG pcdatshop
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: pcdatshop
+- name: TG pechatdlyadoma
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: pechatdlyadoma
+- name: TG picoIand
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: picoIand
+- name: TG polzaSAS
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: polzaSAS
+- name: TG polzaSKIDKI
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: polzaSKIDKI
+- name: TG polza_NET
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: polza_NET
+- name: TG pro_ssd
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: pro_ssd
+- name: TG promokod_ekonom
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: promokod_ekonom
+- name: TG prostechno
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: prostechno
+- name: TG radio_cop
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: radio_cop
+- name: TG radioshop73
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: radioshop73
+- name: TG real_sale
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: real_sale
+- name: TG retrogmng
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: retrogmng
+- name: TG ribalka_prostaya
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ribalka_prostaya
+- name: TG robotobzor
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: robotobzor
+- name: TG sirVikmanDiscounts
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: sirVikmanDiscounts
+- name: TG skidki_promokody_akcii
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: skidki_promokody_akcii
+- name: TG skidkimt
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: skidkimt
+- name: TG smart_life_best
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: smart_life_best
+- name: TG smartdatshop
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: smartdatshop
+- name: TG soundcheck39
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: soundcheck39
+- name: TG stlarch
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: stlarch
+- name: TG stlfdm
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: stlfdm
+- name: TG styleHAN
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: styleHAN
+- name: TG syncertech
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: syncertech
+- name: TG thrifty_fox
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: thrifty_fox
+- name: TG tmall_skidki
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: tmall_skidki
+- name: TG topfreebies
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: topfreebies
+- name: TG tovarizkitaya51
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: tovarizkitaya51
+- name: TG uberdeal
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: uberdeal
+- name: TG uporali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: uporali
+- name: TG we_shopaholics
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: we_shopaholics
+- name: TG xiaclub
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: xiaclub
+- name: TG xiaomik
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: xiaomik
+- name: TG you_cargoods
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: you_cargoods
+- name: TG yourdiscount2020
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: yourdiscount2020
+- name: TG zdorkaty
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: zdorkaty
+- name: TG znak_albine
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: znak_albine
+- name: TG AleXAliexpress
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: AleXAliexpress
+- name: TG Aliexpreess_Kids
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Aliexpreess_Kids
+- name: TG Chanelpokl
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Chanelpokl
+- name: TG DjuelitaVavilova
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: DjuelitaVavilova
+- name: TG ExclusivesWB
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ExclusivesWB
+- name: TG JuliaPchelka
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: JuliaPchelka
+- name: TG LTM_AliExpert
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: LTM_AliExpert
+- name: TG LTM_AliHome
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: LTM_AliHome
+- name: TG Mad_Gadget
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Mad_Gadget
+- name: TG Marabastardoss
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Marabastardoss
+- name: TG MarketPlace_Gid
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: MarketPlace_Gid
+- name: TG MyHomeFinds
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: MyHomeFinds
+- name: TG TakayaNatura_GreenWorld
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: TakayaNatura_GreenWorld
+- name: TG Zorn_hell_boiler
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: Zorn_hell_boiler
+- name: TG aianstories
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aianstories
+- name: TG alevtinjaa
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: alevtinjaa
+- name: TG alexis_kids
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: alexis_kids
+- name: TG alexis_pets
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: alexis_pets
+- name: TG ali_express_style
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ali_express_style
+- name: TG ali_menswear
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ali_menswear
+- name: TG alibyri
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: alibyri
+- name: TG alicozy
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: alicozy
+- name: TG aliexpress_4kids
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliexpress_4kids
+- name: TG aliexpress_aktsii
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliexpress_aktsii
+- name: TG aliexpress_no_stress
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliexpress_no_stress
+- name: TG aliexpress_russki
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliexpress_russki
+- name: TG aliexpressforbaby
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliexpressforbaby
+- name: TG aliexpressschool
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliexpressschool
+- name: TG aliexspress_naskidkah
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliexspress_naskidkah
+- name: TG aliexspresskids
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliexspresskids
+- name: TG aliforhomes
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliforhomes
+- name: TG alinaflycloud
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: alinaflycloud
+- name: TG aliwbmarket
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliwbmarket
+- name: TG aliwithron_man
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliwithron_man
+- name: TG aliwomen
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: aliwomen
+- name: TG allformenali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: allformenali
+- name: TG alyaprowb
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: alyaprowb
+- name: TG ananazreview
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ananazreview
+- name: TG andrew_pepelats
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: andrew_pepelats
+- name: TG annakraeva1
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: annakraeva1
+- name: TG ansils
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ansils
+- name: TG azourabova
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: azourabova
+- name: TG baby_outfitt
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: baby_outfitt
+- name: TG balyabina_sofi
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: balyabina_sofi
+- name: TG bar_kosmetika
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: bar_kosmetika
+- name: TG barahlyandiya
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: barahlyandiya
+- name: TG beautyjars
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: beautyjars
+- name: TG bestnahodkiwb
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: bestnahodkiwb
+- name: TG bmkvefa
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: bmkvefa
+- name: TG bottega_nadeta
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: bottega_nadeta
+- name: TG buyorforget
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: buyorforget
+- name: TG chicshalom
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: chicshalom
+- name: TG chinataina
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: chinataina
+- name: TG colorfuljournal
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: colorfuljournal
+- name: TG cosyhomee
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: cosyhomee
+- name: TG cozyhome_lika
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: cozyhome_lika
+- name: TG credit_ural_bank
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: credit_ural_bank
+- name: TG darya_kamalova_thecablook
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: darya_kamalova_thecablook
+- name: TG dash_kupi_garazh
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: dash_kupi_garazh
+- name: TG dashenka_weiss
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: dashenka_weiss
+- name: TG decor_channel
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: decor_channel
+- name: TG desingokey
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: desingokey
+- name: TG detskieveshishop
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: detskieveshishop
+- name: TG dety_stylist
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: dety_stylist
+- name: TG dev_alik
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: dev_alik
+- name: TG devochki_na
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: devochki_na
+- name: TG didi_pro_ali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: didi_pro_ali
+- name: TG discount_trend
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: discount_trend
+- name: TG domnews_tut
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: domnews_tut
+- name: TG dont_hate_clothes
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: dont_hate_clothes
+- name: TG elenabogd68
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: elenabogd68
+- name: TG elennne_style
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: elennne_style
+- name: TG elennneschool
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: elennneschool
+- name: TG elyaproshopping
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: elyaproshopping
+- name: TG estet_room
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: estet_room
+- name: TG esv_life_style
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: esv_life_style
+- name: TG etotvoihotelki
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: etotvoihotelki
+- name: TG fashionalikids
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: fashionalikids
+- name: TG fashioninn
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: fashioninn
+- name: TG femiskida
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: femiskida
+- name: TG femiskidawb
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: femiskidawb
+- name: TG fruclover
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: fruclover
+- name: TG full_of_style
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: full_of_style
+- name: TG gadjety_fashion
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: gadjety_fashion
+- name: TG gdekypulastyke
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: gdekypulastyke
+- name: TG gerasimmirV
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: gerasimmirV
+- name: TG girl_who
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: girl_who
+- name: TG gokidspeterburg
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: gokidspeterburg
+- name: TG gurylevaalina
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: gurylevaalina
+- name: TG helen_aliexpress
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: helen_aliexpress
+- name: TG hellodress
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: hellodress
+- name: TG hellokids_ali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: hellokids_ali
+- name: TG hellosweethome
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: hellosweethome
+- name: TG home_ali_wb
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: home_ali_wb
+- name: TG home_where
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: home_where
+- name: TG homelyandiya
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: homelyandiya
+- name: TG hotcouture
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: hotcouture
+- name: TG inessa_chwe
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: inessa_chwe
+- name: TG inmyroomdiy
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: inmyroomdiy
+- name: TG iraobali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: iraobali
+- name: TG irilook
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: irilook
+- name: TG jul_sharit
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: jul_sharit
+- name: TG juli_pro_ali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: juli_pro_ali
+- name: TG juliadamonn
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: juliadamonn
+- name: TG kiki_evans
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: kiki_evans
+- name: TG kinessi
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: kinessi
+- name: TG kkkoruca
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: kkkoruca
+- name: TG klemanya
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: klemanya
+- name: TG konasovatut
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: konasovatut
+- name: TG kostanashvili
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: kostanashvili
+- name: TG kseniyayess
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: kseniyayess
+- name: TG lady13_itao
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: lady13_itao
+- name: TG lavandaloves
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: lavandaloves
+- name: TG leela_shopaholic
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: leela_shopaholic
+- name: TG leravmode_ali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: leravmode_ali
+- name: TG leriana_style
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: leriana_style
+- name: TG light_wb
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: light_wb
+- name: TG lightandfashion
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: lightandfashion
+- name: TG lika_ali_kids
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: lika_ali_kids
+- name: TG lika_pro_ali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: lika_pro_ali
+- name: TG liliitom
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: liliitom
+- name: TG lisaeevasaddiction
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: lisaeevasaddiction
+- name: TG littlefeetbigworries
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: littlefeetbigworries
+- name: TG localdress
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: localdress
+- name: TG look_myday
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: look_myday
+- name: TG lookdekor
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: lookdekor
+- name: TG lookinaesthetics
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: lookinaesthetics
+- name: TG looks_ali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: looks_ali
+- name: TG malusyaaliexpress
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: malusyaaliexpress
+- name: TG man_looks
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: man_looks
+- name: TG man_whos
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: man_whos
+- name: TG mary_for_kids
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mary_for_kids
+- name: TG mashasovetuet
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mashasovetuet
+- name: TG massaliexpress
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: massaliexpress
+- name: TG mi_berem
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mi_berem
+- name: TG miirmiimii
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: miirmiimii
+- name: TG milyjdom
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: milyjdom
+- name: TG mishacloud
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mishacloud
+- name: TG mmmlkssss
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mmmlkssss
+- name: TG moda_marketingg
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: moda_marketingg
+- name: TG modnayacoma
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: modnayacoma
+- name: TG momsonmarketplaces
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: momsonmarketplaces
+- name: TG mumAliExpress
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: mumAliExpress
+- name: TG nadela_b
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: nadela_b
+- name: TG nahodkisale
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: nahodkisale
+- name: TG nastia_kosh_TG
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: nastia_kosh_TG
+- name: TG nastya_melll
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: nastya_melll
+- name: TG ne_valentino
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: ne_valentino
+- name: TG negeneralova108
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: negeneralova108
+- name: TG not_ikea
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: not_ikea
+- name: TG obstanovkpokaifu
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: obstanovkpokaifu
+- name: TG obzor_podborki
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: obzor_podborki
+- name: TG oly_richardss
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: oly_richardss
+- name: TG onasharitzabeauty
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: onasharitzabeauty
+- name: TG onehomedecor
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: onehomedecor
+- name: TG otkuda_sticker
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: otkuda_sticker
+- name: TG pinkandfashion
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: pinkandfashion
+- name: TG podaroknadenrozhdeniya
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: podaroknadenrozhdeniya
+- name: TG pollinasha_reserve
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: pollinasha_reserve
+- name: TG polushubock
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: polushubock
+- name: TG pushkinanatalie
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: pushkinanatalie
+- name: TG radikovnaa_ell
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: radikovnaa_ell
+- name: TG reelsmarket
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: reelsmarket
+- name: TG renata_ali_shopping
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: renata_ali_shopping
+- name: TG risovanie_tg
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: risovanie_tg
+- name: TG safonaloyna1
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: safonaloyna1
+- name: TG salepiter
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: salepiter
+- name: TG shopotherapy
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: shopotherapy
+- name: TG shoppingfyou
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: shoppingfyou
+- name: TG skazkiZlatovlaskii
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: skazkiZlatovlaskii
+- name: TG skidka_detyam
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: skidka_detyam
+- name: TG skidkimoll
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: skidkimoll
+- name: TG spicynajulia
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: spicynajulia
+- name: TG stilno_arts
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: stilno_arts
+- name: TG style_and_prosecco
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: style_and_prosecco
+- name: TG stylist_plus_size
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: stylist_plus_size
+- name: TG talking_rib
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: talking_rib
+- name: TG testsapo
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: testsapo
+- name: TG tidarler
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: tidarler
+- name: TG tochka_skidki
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: tochka_skidki
+- name: TG topobves
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: topobves
+- name: TG tovarka_dom
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: tovarka_dom
+- name: TG tutselflove
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: tutselflove
+- name: TG udacha_shoping
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: udacha_shoping
+- name: TG uyutny_ali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: uyutny_ali
+- name: TG vam_na_vyrost
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: vam_na_vyrost
+- name: TG vavdeyukekaterina
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: vavdeyukekaterina
+- name: TG visuology
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: visuology
+- name: TG vse_rozovoe
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: vse_rozovoe
+- name: TG vshivaya_intelligenciya
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: vshivaya_intelligenciya
+- name: TG wishlistik_ru
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: wishlistik_ru
+- name: TG yaponia_tg
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: yaponia_tg
+- name: TG yaponskoe
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: yaponskoe
+- name: TG yourcuteali
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: yourcuteali
+- name: TG yut_for_home
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: yut_for_home
+- name: TG zerofreedays
+  type: telegram
+  scope: selection
+  category: deals
+  lang: ru
+  enabled: true
+  channel: zerofreedays
