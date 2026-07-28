@@ -115,8 +115,18 @@ def build_inbox_md(articles: list, scope: str, date_str: str) -> str:
                 lines.append(f"  来源：{source}")
 
             # 优先用API返回的full_text（VPS采集时已抓），没有则fallback到summary
+            # 过滤无效full_text（Cloudflare挑战页、付费墙、JS乱码）
             full_text = (a.get("full_text") or "").strip()
             summary = (a.get("summary") or "").strip()[:150]
+            if full_text:
+                ft_lower = full_text.lower()
+                # 检测Cloudflare/JS挑战页、CSS规则、付费墙等无效内容
+                if any(p in ft_lower for p in [
+                    "enable javascript", "window._cf_chl_opt", ".logo{margin",
+                    "function(){"[:12], "cf_chl_rt_tk", "member exclusive",
+                    "cookies to continue", "lock,.logo{display"
+                ]):
+                    full_text = ""  # 淘汰，走summary
 
             if full_text:
                 lines.append(f"  原文：{full_text}")
@@ -192,45 +202,68 @@ def _download_image(url: str, save_path: str) -> bool:
     return False
 
 
+def _extract_product_images(raw_content: str) -> list:
+    """从 raw_content 提取商品级图片列表。
+    新格式: {products: [{text, images, links}], images: [...], links: [...]}
+    旧格式: {images: [...], links: [...]}
+    返回: [{"text": ..., "images": [...], "links": [...]}]
+    """
+    if not raw_content:
+        return []
+    try:
+        rc = json.loads(raw_content)
+    except Exception:
+        return []
+    products = rc.get("products", [])
+    if products:
+        return products
+    # 旧格式兼容
+    images = rc.get("images", [])
+    links = rc.get("links", [])
+    if images or links:
+        return [{"text": "", "images": images, "links": links}]
+    return []
+
+
 def _download_article_images(articles: list, img_dir: str) -> dict:
-    """批量下载文章图片到指定目录（并发+总超时），返回 {article_index: [local_paths]}。"""
+    """批量下载文章图片到指定目录（并发+总超时）。
+    返回 {(article_idx, product_idx): [local_paths]}，按商品维度绑定图片。
+    """
     import time as _time
     from concurrent.futures import ThreadPoolExecutor
 
-    IMG_WORKERS = 10          # 并发数
-    TOTAL_DEADLINE = 90       # 总超时（秒），防止无限卡住
-    MAX_IMGS_PER_ITEM = 3     # 每条最多几张
+    IMG_WORKERS = 10
+    TOTAL_DEADLINE = 90
+    MAX_IMGS_PER_PRODUCT = 2
 
     os.makedirs(img_dir, exist_ok=True)
     result = {}
     total = 0
-    tasks = []  # (idx, img_url, save_path)
+    tasks = []
 
     for idx, a in enumerate(articles):
-        images = []
-        raw_content = a.get("raw_content", "")
-        if raw_content:
-            try:
-                rc = json.loads(raw_content)
-                images = rc.get("images", [])
-            except Exception:
-                pass
-        if not images:
+        products = _extract_product_images(a.get("raw_content", ""))
+        if not products:
             continue
         src = a.get("source", "unknown").replace("/", "_").replace(" ", "_")[:30]
-        for i, img_url in enumerate(images[:MAX_IMGS_PER_ITEM]):
-            ext = ".jpg"
-            if ".png" in img_url:
-                ext = ".png"
-            elif ".webp" in img_url:
-                ext = ".webp"
-            filename = f"{src}_{idx}_{i}{ext}"
-            save_path = os.path.join(img_dir, filename)
-            if os.path.exists(save_path):
-                result.setdefault(idx, []).append(save_path)
-            else:
-                total += 1
-                tasks.append((idx, img_url, save_path))
+        for p_idx, product in enumerate(products):
+            images = product.get("images", [])
+            if not images:
+                continue
+            for i, img_url in enumerate(images[:MAX_IMGS_PER_PRODUCT]):
+                ext = ".jpg"
+                if ".png" in img_url:
+                    ext = ".png"
+                elif ".webp" in img_url:
+                    ext = ".webp"
+                filename = f"{src}_{idx}_p{p_idx}_{i}{ext}"
+                save_path = os.path.join(img_dir, filename)
+                key = (idx, p_idx)
+                if os.path.exists(save_path):
+                    result.setdefault(key, []).append(save_path)
+                else:
+                    total += 1
+                    tasks.append((key, img_url, save_path))
 
     if not tasks:
         existing = sum(len(v) for v in result.values())
@@ -243,21 +276,21 @@ def _download_article_images(articles: list, img_dir: str) -> dict:
     fail = 0
 
     with ThreadPoolExecutor(max_workers=IMG_WORKERS) as pool:
-        futures = {pool.submit(_download_image, url, path): (idx, path) for idx, url, path in tasks}
+        futures = {pool.submit(_download_image, url, path): (key, path) for key, url, path in tasks}
         for fut in list(futures):
             remaining = TOTAL_DEADLINE - (_time.monotonic() - start)
             if remaining <= 0:
                 print(f"  ⚠️ 图片下载总超时，已处理 {ok+fail}/{len(tasks)}")
                 pool.shutdown(wait=False, cancel_futures=True)
                 break
-            idx, path = futures[fut]
+            key, path = futures[fut]
             try:
                 success = fut.result(timeout=max(remaining, 1))
             except Exception:
                 success = False
             if success:
                 ok += 1
-                result.setdefault(idx, []).append(path)
+                result.setdefault(key, []).append(path)
             else:
                 fail += 1
 
@@ -267,12 +300,11 @@ def _download_article_images(articles: list, img_dir: str) -> dict:
 
 
 def build_ecom_products_md(articles: list, date_str: str, img_map: dict = None) -> str:
-    """按 source 分组输出选品数据，兼容方远热卖好物初稿的输入格式。
-    格式：# 标题 > ## 频道名 > ### [时间] 标题 + 描述 + 链接 + 本地图片
+    """按 source 分组输出选品数据，每个商品单独配图+描述+链接。
+    img_map 格式: {(article_idx, product_idx): [local_paths]}
     """
     import re
 
-    # 按 source 分组
     by_source = {}
     for a in articles:
         src = a.get("source", "unknown")
@@ -289,7 +321,6 @@ def build_ecom_products_md(articles: list, date_str: str, img_map: dict = None) 
         lines.append(f"## {src}")
         lines.append("")
         for item_idx, a in enumerate(items):
-            # 找到这篇文章在 articles 里的全局索引
             global_idx = None
             for gi, ga in enumerate(articles):
                 if ga is a:
@@ -297,9 +328,7 @@ def build_ecom_products_md(articles: list, date_str: str, img_map: dict = None) 
                     break
 
             title = a.get("title", "").strip()
-            desc = a.get("summary", "").strip()
             pub = a.get("published_at", "")
-            # 提取发布日期简写
             pub_short = ""
             if pub:
                 try:
@@ -309,52 +338,92 @@ def build_ecom_products_md(articles: list, date_str: str, img_map: dict = None) 
                 except Exception:
                     pass
 
-            lines.append(f"### [{pub_short}] {title}")
-            lines.append("")
+            # 提取商品级数据
+            products = _extract_product_images(a.get("raw_content", ""))
 
-            # 图片：优先用本地下载的，fallback 到远程 URL
-            images = []
-            raw_content = a.get("raw_content", "")
-            if raw_content:
-                try:
-                    rc = json.loads(raw_content)
-                    images = rc.get("images", [])
-                except Exception:
-                    pass
+            if not products:
+                # 无 raw_content，用 summary 兜底
+                desc = a.get("summary", "").strip()
+                links = re.findall(r'https?://[^\s)"<>]+', desc)
+                url = a.get("url", "")
+                if url and url not in links:
+                    links.insert(0, url)
+                local_imgs = img_map.get((global_idx, 0), []) if img_map else []
 
-            local_imgs = img_map.get(global_idx, []) if img_map else []
-            if local_imgs:
-                for lp in local_imgs:
-                    lines.append(f"![img]({lp})")
+                lines.append(f"### [{pub_short}] {title}")
                 lines.append("")
-            elif images:
-                for img in images[:3]:
-                    lines.append(f"![img]({img})")
+                if local_imgs:
+                    for lp in local_imgs:
+                        lines.append(f"![img]({lp})")
+                    lines.append("")
+                if desc:
+                    lines.append(desc)
+                    lines.append("")
+                if links:
+                    lines.append("**链接:**")
+                    for lnk in links[:10]:
+                        lines.append(f"- {lnk}")
+                lines.append("")
+                lines.append("---")
+                lines.append("")
+                continue
+
+            # 有商品级配对：逐商品输出
+            for p_idx, product in enumerate(products):
+                p_text = product.get("text", "").strip()
+                p_images = product.get("images", [])
+                p_links = product.get("links", [])
+
+                # 商品标题：如果多商品，标题加序号；单商品用原 title
+                if len(products) > 1:
+                    p_title = f"{title} ({p_idx + 1}/{len(products)})"
+                else:
+                    p_title = title
+
+                lines.append(f"### [{pub_short}] {p_title}")
                 lines.append("")
 
-            if desc:
-                lines.append(desc)
+                # 图片：优先本地，fallback 远程
+                local_imgs = img_map.get((global_idx, p_idx), []) if img_map else []
+                if local_imgs:
+                    for lp in local_imgs:
+                        lines.append(f"![img]({lp})")
+                    lines.append("")
+                elif p_images:
+                    for img in p_images[:2]:
+                        lines.append(f"![img]({img})")
+                    lines.append("")
+
+                # 描述
+                desc = p_text or a.get("summary", "").strip()
+                if desc:
+                    lines.append(desc)
+                    lines.append("")
+
+                # 链接
+                if p_links:
+                    lines.append("**链接:**")
+                    for lnk in p_links[:10]:
+                        lines.append(f"- {lnk}")
+                else:
+                    links = re.findall(r'https?://[^\s)"<>]+', p_text)
+                    url = a.get("url", "")
+                    if url and url not in links:
+                        links.insert(0, url)
+                    if links:
+                        lines.append("**链接:**")
+                        for lnk in links[:10]:
+                            lines.append(f"- {lnk}")
+
+                # 标签
+                tags = re.findall(r'#\w+', p_text)
+                if tags:
+                    lines.append("")
+                    lines.append(f"标签: {' '.join(set(tags))}")
+
                 lines.append("")
-
-            # 提取链接
-            links = re.findall(r'https?://[^\s)"<>]+', desc)
-            url = a.get("url", "")
-            if url and url not in links:
-                links.insert(0, url)
-            if links:
-                lines.append("**链接:**")
-                for lnk in links[:10]:
-                    lines.append(f"- {lnk}")
-
-            # 标签
-            tags = re.findall(r'#\w+', desc)
-            if tags:
+                lines.append("---")
                 lines.append("")
-                lines.append(f"标签: {' '.join(set(tags))}")
-
-            lines.append("")
-            lines.append("---")
-            lines.append("")
 
     return "\n".join(lines)
 
@@ -364,12 +433,15 @@ def main():
     parser.add_argument("--scope", choices=["tech", "russia", "selection", "cross-border"],
                         help="拉取哪个 scope 的数据")
     parser.add_argument("--all", action="store_true", help="拉取所有 scope")
+    parser.add_argument("--date", default=None, help="指定日期 YYYY-MM-DD（默认今天 CST）")
+    parser.add_argument("--merge-cross-border", action="store_true",
+                        help="russia scope 时额外拉取 cross-border 并融合到 russia.md")
     args = parser.parse_args()
 
     scopes = ["tech", "cross-border", "russia", "selection"] if args.all else [args.scope]
 
     # 统一用北京时间日期
-    today = datetime.now(CST).strftime("%Y-%m-%d")
+    today = args.date if args.date else datetime.now(CST).strftime("%Y-%m-%d")
 
     for scope in scopes:
         if not scope:
@@ -400,10 +472,23 @@ def main():
         else:
             md_path = os.path.join(day_dir, f"{today}_{scope}.md")
 
+
         if scope == "tech" and os.path.exists(md_path):
             content = build_inbox_md(articles, scope, today)
             with open(md_path, "a", encoding="utf-8") as f:
                 f.write("\n\n" + content + "\n")
+        elif scope == "russia" and args.merge_cross_border:
+            content = build_inbox_md(articles, scope, today)
+            # 额外拉取 cross-border
+            cb_articles = fetch_articles("cross-border", today)
+            if cb_articles:
+                cb_content = build_inbox_md(cb_articles, "cross-border", today)
+                merged = content + "\n\n" + cb_content
+            else:
+                merged = content
+            with open(md_path, "w", encoding="utf-8") as f:
+                f.write(merged + "\n")
+            print(f"  ✅ Merged {len(articles)} russia + {len(cb_articles)} cross-border → {md_path}")
         else:
             content = build_inbox_md(articles, scope, today)
             with open(md_path, "w", encoding="utf-8") as f:
