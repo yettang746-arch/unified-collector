@@ -10,6 +10,12 @@ services:
     volumes:
       - ./data:/app/data
       - ./config:/app/config
+    # 硬编码 DNS：避免依赖 host 的 /etc/resolv.conf（若 host 上 Tailscale MagicDNS 100.100.100.100
+    # 健康检查失败，所有容器内域名解析会断）。任何容器重启都能拿到稳定 DNS。
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+      - 9.9.9.9
     environment:
       - API_KEY=${API_KEY}
       - DB_URL=postgresql://collector:${PG_PASSWORD}@postgres:5432/collector
