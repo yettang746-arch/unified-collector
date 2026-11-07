@@ -58,8 +58,17 @@ def _ssl_ctx():
     ctx.set_ciphers("DEFAULT:@SECLEVEL=1")
     return ctx
 
-def fetch_articles(scope: str, date_str: str) -> list:
-    url = f"{API_URL}/api/v1/articles?scope={scope}&date={date_str}&limit=500"
+API_PAGE_LIMIT = 500      # 单页拉取上限
+MAX_PAGES = 20            # 分页安全上限，防止接口 total 异常导致死循环
+
+
+def _fetch_articles_page(scope: str, date_str: str, offset: int, limit: int) -> tuple:
+    """拉取单页文章，返回 (articles, total)。
+
+    total 为 None 表示接口未返回总数字段，此时只能按本页数量判断是否继续。
+    """
+    url = (f"{API_URL}/api/v1/articles?scope={scope}&date={date_str}"
+           f"&limit={limit}&offset={offset}")
     # Prefer curl (avoids Python SSL issues on some hosts)
     import subprocess
     try:
@@ -69,7 +78,7 @@ def fetch_articles(scope: str, date_str: str) -> list:
         )
         if result.returncode == 0 and result.stdout.strip():
             data = json.loads(result.stdout)
-            return data.get("articles", [])
+            return data.get("articles", []), data.get("total")
     except Exception:
         pass
     # Fallback to urllib
@@ -81,7 +90,40 @@ def fetch_articles(scope: str, date_str: str) -> list:
     ctx = _ssl_ctx()
     with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:
         data = json.loads(resp.read())
-    return data.get("articles", [])
+    return data.get("articles", []), data.get("total")
+
+
+def fetch_articles(scope: str, date_str: str) -> list:
+    """分页拉取当天全部文章。
+
+    2026-11-07 修复：此前固定 limit=500 且不做分页，接口 total=587 时静默丢掉 87 条，
+    下游选品数据不完整。改为按 total 循环翻页。
+    """
+    all_articles = []
+    offset = 0
+    total = None
+    for _ in range(MAX_PAGES):
+        try:
+            articles, page_total = _fetch_articles_page(scope, date_str, offset, API_PAGE_LIMIT)
+        except Exception as e:
+            print(f"  WARN page fetch failed offset={offset}: {e}")
+            break
+        if page_total is not None:
+            total = page_total
+        if not articles:
+            break
+        all_articles.extend(articles)
+        offset += len(articles)
+        if total is None:
+            # 接口没给 total：只有拉满一页才继续翻下一页
+            if len(articles) < API_PAGE_LIMIT:
+                break
+            continue
+        if offset >= total:
+            break
+    if total is not None and len(all_articles) < total:
+        print(f"  WARN incomplete pagination: {len(all_articles)}/{total}")
+    return all_articles
 
 
 def build_inbox_md(articles: list, scope: str, date_str: str) -> str:
@@ -160,7 +202,11 @@ def build_selection_json(articles: list, img_map: dict = None) -> list:
                 remote_images = rc.get("images", [])
             except Exception:
                 pass
-        local_imgs = img_map.get(idx, []) if img_map else []
+        # img_map 的 key 是 (article_idx, product_idx)，按商品维度收集本地图片
+        local_imgs = []
+        if img_map:
+            for pi in range(len(_extract_product_images(a.get("raw_content", ""))) or 1):
+                local_imgs.extend(img_map.get((idx, pi), []))
         results.append({
             "source": a.get("source", ""),
             "category": a.get("category", ""),
@@ -176,29 +222,72 @@ def build_selection_json(articles: list, img_map: dict = None) -> list:
     return results
 
 
+_IMAGE_MAGIC = (b"\xff\xd8\xff", b"\x89PNG", b"GIF8", b"RIFF", b"BM")
+_IMG_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+           "(KHTML, like Gecko) Chrome/125.0 Safari/537.36")
+
+# 每个商品最多下载几张图（补下载脚本 download-selection-images.py 需与之保持一致）
+MAX_IMGS_PER_PRODUCT = 2
+
+
+def _is_valid_image_file(path: str) -> bool:
+    """内容级校验：magic bytes + 最小体积。
+
+    CDN 超时/500 时会返回 198 字节的 nginx HTML 错误页，
+    仅用 os.path.exists() 判定会把垃圾图当成"已缓存"，造成假绿。
+    """
+    try:
+        if not os.path.exists(path) or os.path.getsize(path) < 1024:
+            return False
+        with open(path, "rb") as f:
+            head = f.read(16)
+        low = head.lower()
+        if b"<html" in low or b"<!doc" in low:
+            return False
+        return any(head.startswith(m) for m in _IMAGE_MAGIC)
+    except OSError:
+        return False
+
+
 def _download_image(url: str, save_path: str) -> bool:
-    """下载图片到本地，返回是否成功。"""
+    """下载图片到本地，返回是否成功（内容校验通过才算成功）。
+
+    先写 .part 临时文件，校验通过再 replace，避免失败时在磁盘留下垃圾文件。
+    """
     import subprocess
+    tmp_path = save_path + ".part"
     try:
         result = subprocess.run(
-            ["curl", "-sS", "-m", "5", "-o", save_path, url],
-            capture_output=True, timeout=8
+            ["curl", "-sS", "-L", "--compressed", "-m", "15",
+             "-H", f"User-Agent: {_IMG_UA}",
+             "-H", "Referer: https://telesco.pe/",
+             "-o", tmp_path, url],
+            capture_output=True, timeout=25
         )
-        if result.returncode == 0 and os.path.exists(save_path) and os.path.getsize(save_path) > 100:
+        if result.returncode == 0 and _is_valid_image_file(tmp_path):
+            os.replace(tmp_path, save_path)
             return True
     except Exception:
         pass
     # Fallback to urllib
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": _IMG_UA})
         ctx = _ssl_ctx()
-        with urllib.request.urlopen(req, timeout=5, context=ctx) as resp:
+        with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
             if resp.status == 200:
-                with open(save_path, "wb") as f:
+                with open(tmp_path, "wb") as f:
                     f.write(resp.read())
-                return True
+                if _is_valid_image_file(tmp_path):
+                    os.replace(tmp_path, save_path)
+                    return True
     except Exception as e:
         print(f"    ⚠️ 下载失败 {url[:60]}...: {e}")
+    finally:
+        if os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
     return False
 
 
@@ -233,8 +322,7 @@ def _download_article_images(articles: list, img_dir: str) -> dict:
     from concurrent.futures import ThreadPoolExecutor
 
     IMG_WORKERS = 10
-    TOTAL_DEADLINE = 90
-    MAX_IMGS_PER_PRODUCT = 2
+    TOTAL_DEADLINE = 300
 
     os.makedirs(img_dir, exist_ok=True)
     result = {}
@@ -259,9 +347,15 @@ def _download_article_images(articles: list, img_dir: str) -> dict:
                 filename = f"{src}_{idx}_p{p_idx}_{i}{ext}"
                 save_path = os.path.join(img_dir, filename)
                 key = (idx, p_idx)
-                if os.path.exists(save_path):
+                if _is_valid_image_file(save_path):
                     result.setdefault(key, []).append(save_path)
                 else:
+                    # 存在但内容无效（HTML 错误页/截断）→ 重新下载
+                    if os.path.exists(save_path):
+                        try:
+                            os.remove(save_path)
+                        except OSError:
+                            pass
                     total += 1
                     tasks.append((key, img_url, save_path))
 
@@ -511,6 +605,17 @@ def main():
             with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(sel_data, f, ensure_ascii=False, indent=2)
             print(f"  📦 JSON: {len(sel_data)} items → {json_path}")
+
+            # 原始选品数据（含 raw_content），供下游按原始 URL 重建补下载任务
+            raw_sel_path = os.path.join(day_dir, f"{today}_selection.json")
+            raw_items = []
+            for i, art in enumerate(articles):
+                item = dict(art)
+                item["idx"] = i
+                raw_items.append(item)
+            with open(raw_sel_path, "w", encoding="utf-8") as f:
+                json.dump(raw_items, f, ensure_ascii=False, indent=2)
+            print(f"  🧾 原始数据: {len(raw_items)} items → {raw_sel_path}")
         else:
             print(f"  ✅ Written {len(content)} bytes → {md_path}")
 

@@ -28,6 +28,39 @@ TOTAL_DEADLINE = 120   # 总超时（秒）
 MAX_IMGS_PER_ITEM = 3  # 每条最多几张
 
 
+def _load_max_imgs_per_product() -> int:
+    """与主拉取脚本 pull-from-collector.py 保持一致，避免补下载产生未引用/错位文件。"""
+    try:
+        import importlib.util
+        pull_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pull-from-collector.py")
+        spec = importlib.util.spec_from_file_location("pull_from_collector", pull_path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return int(getattr(mod, "MAX_IMGS_PER_PRODUCT", 2))
+    except Exception:
+        return 2
+
+
+MAX_IMGS_PER_PRODUCT = _load_max_imgs_per_product()
+
+_IMAGE_MAGIC = (b"\xff\xd8\xff", b"\x89PNG", b"GIF8", b"RIFF", b"BM")
+
+
+def is_valid_image_file(path: str) -> bool:
+    """内容级校验：magic bytes + 最小体积（防 nginx 500 HTML 错误页）。"""
+    try:
+        if not os.path.exists(path) or os.path.getsize(path) < 1024:
+            return False
+        with open(path, "rb") as f:
+            head = f.read(16)
+        low = head.lower()
+        if b"<html" in low or b"<!doc" in low:
+            return False
+        return any(head.startswith(m) for m in _IMAGE_MAGIC)
+    except OSError:
+        return False
+
+
 def download_images_for_date(date_str: str):
     """为指定日期下载选品图片。"""
     # 找 selection.json 或 ecom_products.json
@@ -52,35 +85,88 @@ def download_images_for_date(date_str: str):
     img_dir = os.path.join(BASE_DIR, date_str, "images")
     os.makedirs(img_dir, exist_ok=True)
 
+    # 与主拉取脚本 pull-from-collector.py 对齐：
+    # 兼容两种数据源：
+    #  A) selection.json -> 每条含 raw_content(products结构)
+    #  B) ecom_products.json -> 每条 image 字段即远程URL列表（每日实际场景）
+    # 文件名格式 {src}_{idx}_p{p_idx}_{i}.ext（关键：带 _p{p_idx} 段，
+    #  否则无法识别主脚本已下载的文件，导致误报“所有图片已存在”。
+    def extract_sources(item):
+        """返回 [(远程url, p_idx, i_in_product), ...]
+
+        i_in_product 必须是“该商品内第几张图”，与主拉取脚本的文件名规则
+        `{src}_{idx}_p{p_idx}_{i}` 严格一致，否则会生成错位文件名。
+        """
+        raw = item.get("raw_content", "")
+        if raw:
+            try:
+                rc = json.loads(raw) if isinstance(raw, str) else raw
+            except Exception:
+                rc = None
+            if rc:
+                products = rc.get("products", [])
+                if products:
+                    out = []
+                    for pi, p in enumerate(products):
+                        for i, u in enumerate(p.get("images", [])[:MAX_IMGS_PER_PRODUCT]):
+                            out.append((u, pi, i))
+                    return out
+                out = []
+                for i, u in enumerate(rc.get("images", [])[:MAX_IMGS_PER_PRODUCT]):
+                    out.append((u, 0, i))
+                return out
+        # ecom_products.json: 无 raw_content，无法还原主脚本的 p_idx 分组，
+        # 若直接按平铺 images 重构文件名会与主脚本错位、产生多余文件。
+        # 故此处只读校验 local_images 是否缺失，不做新下载（用重跑主脚本补全）。
+        return []
+
     tasks = []
     existing_count = 0
-    for idx, item in enumerate(items):
-        raw_content = item.get("raw_content", "")
-        if not raw_content:
+    for pos, item in enumerate(items):
+        src_pairs = extract_sources(item)
+        if not src_pairs:
             continue
-        try:
-            rc = json.loads(raw_content) if isinstance(raw_content, str) else raw_content
-            images = rc.get("images", [])
-        except Exception:
-            continue
-        if not images:
-            continue
-
+        idx = item.get("idx", pos)
         src = item.get("source", "unknown").replace("/", "_").replace(" ", "_")[:30]
-        for img_idx, url in enumerate(images[:MAX_IMGS_PER_ITEM]):
+        seen = set()
+        for url, p_idx, i_idx in src_pairs[:MAX_IMGS_PER_PRODUCT * 10]:
+            if (p_idx, i_idx) in seen:
+                continue
+            seen.add((p_idx, i_idx))
             ext = ".jpg"
             if ".png" in url:
                 ext = ".png"
             elif ".webp" in url:
                 ext = ".webp"
-            fname = f"{src}_{idx}_{img_idx}{ext}"
+            fname = f"{src}_{idx}_p{p_idx}_{i_idx}{ext}"
             fpath = os.path.join(img_dir, fname)
-            if os.path.exists(fpath):
+            if is_valid_image_file(fpath):
                 existing_count += 1
             else:
+                if os.path.exists(fpath):
+                    try:
+                        os.remove(fpath)
+                    except OSError:
+                        pass
                 tasks.append((fname, url, fpath))
 
     if not tasks:
+        if json_path == ecom_path:
+            # 只读校验：核对 local_images 引用是否缺失（ecom json 无 raw_content，
+            # 无法重建下载任务，缺失时提示用重跑主脚本补全，避免错位文件）
+            missing = []
+            for item in items:
+                for p in (item.get("local_images") or []):
+                    if p and not is_valid_image_file(p):
+                        missing.append(p)
+            if missing:
+                print(f"  ⚠️ {len(missing)} 张 local_images 引用的图片缺失（可能需重跑主拉取脚本补全）:")
+                for p in missing[:10]:
+                    print(f"    - {p}")
+                return False
+            else:
+                print(f"  ✅ 所有图片已存在，且 local_images 引用完整 ({existing_count} 张)")
+                return True
         print(f"✅ 所有图片已存在 ({existing_count} 张)")
         return True
 
@@ -92,26 +178,36 @@ def download_images_for_date(date_str: str):
 
     def _dl(args):
         fname, url, fpath = args
+        tmp_path = fpath + ".part"
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "curl/8.0"})
             with urllib.request.urlopen(req, timeout=IMG_TIMEOUT, context=SSL_CTX) as r:
                 if r.status == 200:
-                    with open(fpath, "wb") as f:
+                    with open(tmp_path, "wb") as f:
                         f.write(r.read())
-                    return True
+                    if is_valid_image_file(tmp_path):
+                        os.replace(tmp_path, fpath)
+                        return True
         except Exception:
             pass
         # Fallback: curl
         import subprocess
         try:
             result = subprocess.run(
-                ["curl", "-sS", "-m", "5", "-o", fpath, url],
+                ["curl", "-sS", "-m", "5", "-o", tmp_path, url],
                 capture_output=True, timeout=8
             )
-            if result.returncode == 0 and os.path.exists(fpath) and os.path.getsize(fpath) > 100:
+            if result.returncode == 0 and is_valid_image_file(tmp_path):
+                os.replace(tmp_path, fpath)
                 return True
         except Exception:
             pass
+        finally:
+            if os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
         return False
 
     with ThreadPoolExecutor(max_workers=IMG_WORKERS) as pool:
